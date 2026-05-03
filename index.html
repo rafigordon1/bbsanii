@@ -3,502 +3,352 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ANIMA Q | Contemporary Italian Kitchen</title>
+    <title>ANIMA Q | Contemporary Italian</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;400&family=Playfair+Display:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
     
     <style>
         :root {
-            --bg-dark: #0f1c14; 
-            --primary-green: #1b3824;
-            --moss-green: #2e4a35;
-            --accent-gold: #d4af37;
-            --text-light: #fdfcf9;
+            --bg-dark: #09120c; 
+            --primary-green: #14281a;
+            --accent-gold: #e6c55c;
+            --accent-gold-dim: #a68a35;
+            --text-light: #f4f0e6;
             --font-heading: 'Playfair Display', serif;
             --font-body: 'Montserrat', sans-serif;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html { scroll-behavior: smooth; }
-
-        body {
-            font-family: var(--font-body);
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body, html {
             background-color: var(--bg-dark);
             color: var(--text-light);
+            font-family: var(--font-body);
             overflow-x: hidden;
-            -webkit-font-smoothing: antialiased;
+            overscroll-behavior: none;
         }
 
-        @media (pointer: fine) {
-            body { cursor: none; }
+        @media (pointer: fine) { body { cursor: none; } }
+
+        /* --- PRELOADER --- */
+        .preloader {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: var(--bg-dark); z-index: 10000;
+            display: flex; justify-content: center; align-items: center;
+            flex-direction: column; transition: transform 1.2s cubic-bezier(0.77, 0, 0.175, 1);
         }
+        .preloader-text {
+            font-family: var(--font-heading); font-size: 4rem; color: var(--accent-gold);
+            letter-spacing: 10px; font-style: italic; overflow: hidden;
+        }
+        .preloader-counter { margin-top: 1rem; font-size: 1rem; letter-spacing: 5px; color: var(--text-light); }
+        .preloader.hidden { transform: translateY(-100%); }
 
         /* --- CUSTOM CURSOR --- */
-        .custom-cursor {
-            display: none;
-            position: fixed;
-            top: 0; left: 0;
-            width: 10px; height: 10px;
-            background-color: var(--accent-gold);
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 9999;
-            transform: translate(-50%, -50%);
-            transition: width 0.2s, height 0.2s, background-color 0.2s;
+        .cursor-dot, .cursor-outline {
+            position: fixed; top: 0; left: 0; transform: translate(-50%, -50%);
+            border-radius: 50%; pointer-events: none; z-index: 9999;
+        }
+        .cursor-dot { width: 6px; height: 6px; background: var(--accent-gold); transition: width 0.3s, height 0.3s; }
+        .cursor-outline { width: 40px; height: 40px; border: 1px solid var(--accent-gold-dim); transition: width 0.4s, height 0.4s, background 0.4s; }
+        .cursor-dot.hover { width: 0; height: 0; }
+        .cursor-outline.hover { width: 80px; height: 80px; background: rgba(230, 197, 92, 0.1); backdrop-filter: blur(2px); border-color: transparent; }
+
+        /* --- WEBGL & SMOOTH SCROLL WRAPPER --- */
+        #p5-container { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; pointer-events: none; }
+        #smooth-wrapper { position: fixed; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; z-index: 1; }
+        #smooth-content { width: 100%; will-change: transform; }
+
+        /* --- NAVIGATION (MAGNETIC) --- */
+        nav {
+            position: fixed; top: 0; width: 100%; padding: 2.5rem 5%;
+            display: flex; justify-content: space-between; align-items: center; z-index: 100;
             mix-blend-mode: difference;
         }
+        .logo { font-family: var(--font-heading); font-size: 1.8rem; color: #fff; text-decoration: none; letter-spacing: 4px; display: inline-block; }
+        .glowing-q { font-family: var(--font-body); font-weight: 300; margin-left: 2px; }
+        .nav-links { display: flex; gap: 4rem; }
+        .magnetic-wrap { display: inline-block; padding: 10px; }
+        .magnetic-item { display: inline-block; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); color: #fff; text-decoration: none; text-transform: uppercase; letter-spacing: 2px; font-size: 0.8rem; }
+
+        /* --- HERO --- */
+        .hero { height: 100vh; display: flex; flex-direction: column; justify-content: center; padding: 0 5%; position: relative; }
+        .hero-title { font-family: var(--font-heading); font-size: clamp(4rem, 12vw, 12rem); line-height: 0.85; color: var(--text-light); text-transform: uppercase; mix-blend-mode: overlay; opacity: 0; transform: translateY(100px); }
+        .hero-title span { display: block; }
+        .hero-title .indent { margin-left: 15vw; color: var(--accent-gold); font-style: italic; mix-blend-mode: normal; }
+
+        /* --- ADVANCED MENU (HORIZONTAL SCROLL SIMULATION) --- */
+        .menu-section { position: relative; padding: 15vh 0; }
+        .menu-header-sticky { position: absolute; top: 15vh; left: 5%; width: 30%; z-index: 10; }
+        .menu-header-sticky h2 { font-family: var(--font-heading); font-size: clamp(3rem, 6vw, 5rem); color: var(--accent-gold); font-style: italic; line-height: 1; margin-bottom: 2rem; }
+        .menu-header-sticky p { font-size: 1rem; line-height: 1.8; color: rgba(244, 240, 230, 0.6); max-width: 300px; }
+
+        .menu-gallery { display: flex; flex-direction: column; align-items: flex-end; padding-right: 5%; gap: 30vh; margin-top: 20vh; }
         
-        @media (pointer: fine) {
-            .custom-cursor { display: block; }
-        }
-
-        .custom-cursor.hovering {
-            width: 40px; height: 40px;
-            background-color: transparent;
-            border: 1px solid var(--accent-gold);
-            mix-blend-mode: normal;
-        }
-
-        /* --- WEBGL BACKGROUND --- */
-        #p5-container {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            z-index: -1;
-            pointer-events: none;
-        }
-
-        /* --- NAVIGATION --- */
-        nav {
-            position: fixed;
-            top: 0; width: 100%;
-            padding: 2rem 5%;
-            display: flex; justify-content: space-between; align-items: center;
-            z-index: 100;
-            transition: background 0.4s ease, padding 0.4s ease;
-        }
-
-        nav.scrolled {
-            background: rgba(15, 28, 20, 0.9);
-            backdrop-filter: blur(10px);
-            padding: 1.2rem 5%;
-            border-bottom: 1px solid rgba(212, 175, 55, 0.15);
-        }
-
-        .logo {
-            font-family: var(--font-heading);
-            font-size: 2rem;
-            color: var(--text-light);
-            text-decoration: none;
-            letter-spacing: 4px;
-            font-weight: 600;
-        }
-
-        .glowing-q {
-            color: var(--accent-gold);
-            font-style: normal; 
-            font-family: var(--font-body); 
-            font-weight: 400;
-            text-shadow: 0 0 15px rgba(212, 175, 55, 0.6), 0 0 30px rgba(212, 175, 55, 0.3);
-            margin-left: 2px;
-        }
-
-        .nav-links { display: flex; gap: 3rem; }
-        .nav-links a {
-            color: var(--text-light);
-            text-decoration: none;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            position: relative;
-            overflow: hidden;
-        }
+        .menu-item { width: 55%; position: relative; display: flex; flex-direction: column; align-items: flex-start; }
+        .menu-item:nth-child(even) { align-items: flex-end; width: 65%; margin-right: 10%; }
         
-        .nav-links a::after {
-            content: ''; position: absolute; bottom: -4px; left: 0;
-            width: 100%; height: 1px; background: var(--accent-gold);
-            transform: translateX(-100%); transition: transform 0.4s ease;
-        }
-        .nav-links a:hover::after { transform: translateX(0); }
+        .menu-img-container { width: 100%; height: 80vh; overflow: hidden; position: relative; clip-path: polygon(0 100%, 100% 100%, 100% 100%, 0 100%); transition: clip-path 1.5s cubic-bezier(0.77, 0, 0.175, 1); }
+        .menu-img-container.in-view { clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); }
+        .menu-img { width: 100%; height: 130%; object-fit: cover; transform: translateY(-15%); will-change: transform; filter: brightness(0.8) contrast(1.1); }
+        
+        .menu-info { margin-top: 2rem; mix-blend-mode: difference; }
+        .menu-info h3 { font-family: var(--font-heading); font-size: clamp(2rem, 4vw, 4rem); color: #fff; }
+        .menu-info span { display: block; margin-top: 1rem; color: var(--accent-gold); font-family: var(--font-body); font-size: 1.2rem; }
 
-        /* --- HERO SECTION --- */
-        .hero {
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            text-align: center;
-        }
+        /* --- BOOKING (MINIMALIST) --- */
+        .booking-section { min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 5%; position: relative; }
+        .booking-container { width: 100%; max-width: 1000px; }
+        .booking-title { font-family: var(--font-heading); font-size: clamp(3rem, 7vw, 6rem); color: var(--text-light); margin-bottom: 5rem; text-align: center; }
+        
+        .input-row { display: flex; border-bottom: 1px solid rgba(230, 197, 92, 0.3); padding: 2rem 0; transition: border-color 0.4s; position: relative; }
+        .input-row:hover, .input-row:focus-within { border-bottom-color: var(--accent-gold); }
+        .input-row label { flex: 1; font-family: var(--font-body); font-size: 1.2rem; color: rgba(244, 240, 230, 0.5); text-transform: uppercase; letter-spacing: 4px; display: flex; align-items: center; }
+        .input-row input, .input-row select { flex: 2; background: transparent; border: none; color: var(--accent-gold); font-family: var(--font-heading); font-size: 2rem; outline: none; font-style: italic; }
+        
+        .submit-wrap { display: flex; justify-content: flex-end; margin-top: 4rem; }
+        .submit-btn { width: 200px; height: 200px; border-radius: 50%; background: transparent; border: 1px solid var(--accent-gold); color: var(--accent-gold); font-family: var(--font-body); text-transform: uppercase; letter-spacing: 2px; font-size: 1rem; cursor: pointer; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; justify-content: center; align-items: center; }
+        .submit-btn:hover { background: var(--accent-gold); color: var(--bg-dark); transform: scale(0.9); }
 
-        .hero-title {
-            font-family: var(--font-heading);
-            font-size: clamp(3.5rem, 10vw, 8rem);
-            line-height: 1;
-            color: var(--text-light);
-            letter-spacing: 4px;
-            opacity: 0;
-            transform: translateY(30px);
-            animation: fadeUp 1s ease forwards 0.3s;
-        }
+        footer { padding: 4rem 5%; text-align: center; font-family: var(--font-body); font-size: 0.8rem; letter-spacing: 4px; text-transform: uppercase; color: rgba(244, 240, 230, 0.4); mix-blend-mode: difference; }
 
-        .hero-subtitle {
-            font-size: clamp(0.8rem, 2vw, 1.1rem);
-            letter-spacing: 6px;
-            text-transform: uppercase;
-            color: var(--accent-gold);
-            margin-top: 1.5rem;
-            opacity: 0;
-            animation: fadeUp 1s ease forwards 0.8s;
-        }
-
-        /* --- MENU SECTION (Editorial & Innovative) --- */
-        .menu-section {
-            padding: 15vw 5%;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .section-header {
-            font-family: var(--font-body);
-            font-weight: 300;
-            text-transform: uppercase;
-            letter-spacing: 12px;
-            font-size: clamp(1.2rem, 3vw, 2rem);
-            color: var(--accent-gold);
-            margin-bottom: 8rem;
-            text-align: center;
-        }
-
-        .menu-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 20vh;
-            gap: 8vw;
-        }
-
-        .menu-item:nth-child(even) {
-            flex-direction: row-reverse;
-        }
-
-        /* Dynamic Image Sizing & Clip-Path Reveal */
-        .menu-img-wrapper {
-            position: relative;
-            overflow: hidden;
-            border-radius: 2px;
-            width: 45%;
-            height: 70vh;
-            clip-path: inset(100% 0 0 0); /* Hidden at start */
-            transition: clip-path 1.4s cubic-bezier(0.77, 0, 0.175, 1);
-        }
-
-        /* Varying sizes for an editorial feel */
-        .menu-item:nth-child(3) .menu-img-wrapper {
-            width: 55%;
-            height: 55vh;
-        }
-
-        .menu-item.visible .menu-img-wrapper {
-            clip-path: inset(0 0 0 0); /* Revealed */
-        }
-
-        .menu-img {
-            width: 100%;
-            height: 130%;
-            object-fit: cover;
-            transform: translateY(-15%);
-            transition: transform 0.1s linear;
-        }
-
-        .menu-text {
-            width: 45%;
-            opacity: 0;
-            transform: translateY(40px);
-            transition: all 1s ease 0.4s;
-        }
-
-        .menu-item.visible .menu-text {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .menu-text h3 {
-            font-family: var(--font-heading);
-            font-size: clamp(2.5rem, 4vw, 3.5rem);
-            margin-bottom: 1rem;
-            color: var(--text-light);
-            line-height: 1.1;
-        }
-
-        .menu-text p {
-            font-size: 1.05rem;
-            line-height: 1.8;
-            color: rgba(253, 252, 249, 0.7);
-            margin-bottom: 2rem;
-        }
-
-        .menu-text .price {
-            display: inline-block;
-            padding-bottom: 5px;
-            border-bottom: 1px solid var(--accent-gold);
-            color: var(--accent-gold);
-            font-family: var(--font-body);
-            font-weight: 300;
-            font-size: 1.2rem;
-            letter-spacing: 2px;
-        }
-
-        /* --- BOOKING SECTION --- */
-        .booking-section {
-            padding: 10vw 5%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .booking-form {
-            background: rgba(27, 56, 36, 0.6);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(212, 175, 55, 0.3);
-            padding: 4rem;
-            width: 100%;
-            max-width: 800px;
-            border-radius: 8px;
-        }
-
-        .booking-form h2 {
-            font-family: var(--font-heading);
-            font-size: 2.5rem;
-            color: var(--accent-gold);
-            margin-bottom: 3rem;
-            text-align: center;
-        }
-
-        .form-group {
-            margin-bottom: 2rem;
-            position: relative;
-        }
-
-        .form-group input, .form-group select {
-            width: 100%;
-            padding: 15px;
-            background: rgba(0, 0, 0, 0.2);
-            border: 1px solid rgba(253, 252, 249, 0.2);
-            border-radius: 4px;
-            color: var(--text-light);
-            font-family: var(--font-body);
-            font-size: 1rem;
-            outline: none;
-            transition: all 0.3s;
-        }
-
-        .form-group input:focus, .form-group select:focus {
-            border-color: var(--accent-gold);
-            background: rgba(0, 0, 0, 0.4);
-        }
-
-        .form-group input::placeholder {
-            color: rgba(253, 252, 249, 0.5);
-            font-style: italic;
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.5rem;
-        }
-
-        button.submit-btn {
-            width: 100%;
-            padding: 1.2rem;
-            background: var(--accent-gold);
-            border: none;
-            color: var(--bg-dark);
-            font-family: var(--font-body);
-            font-weight: 500;
-            font-size: 1.1rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            cursor: pointer;
-            border-radius: 4px;
-            transition: background 0.3s, transform 0.3s;
-            margin-top: 1rem;
-        }
-
-        button.submit-btn:hover {
-            background: #e6c55c;
-            transform: translateY(-2px);
-        }
-
-        /* --- FOOTER --- */
-        footer {
-            padding: 4rem 5%;
-            text-align: center;
-            border-top: 1px solid rgba(212, 175, 55, 0.15);
-            background: rgba(15, 28, 20, 0.8);
-        }
-
-        /* --- ANIMATIONS & MEDIA QUERIES --- */
-        @keyframes fadeUp {
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @media (max-width: 900px) {
+        @media (max-width: 768px) {
             .nav-links { display: none; }
-            .menu-item, .menu-item:nth-child(even) {
-                flex-direction: column;
-                gap: 2rem;
-            }
-            .menu-img-wrapper, .menu-item:nth-child(3) .menu-img-wrapper {
-                width: 100%;
-                height: 50vh;
-            }
-            .menu-text { width: 100%; }
-            .form-row { grid-template-columns: 1fr; gap: 0; }
-            .booking-form { padding: 2rem; }
+            .menu-header-sticky { position: relative; width: 100%; top: 0; left: 0; margin-bottom: 4rem; }
+            .menu-gallery { margin-top: 0; gap: 10vh; }
+            .menu-item, .menu-item:nth-child(even) { width: 100%; align-items: flex-start; margin-right: 0; }
+            .menu-img-container { height: 60vh; }
+            .input-row { flex-direction: column; gap: 1rem; }
+            .input-row input, .input-row select { font-size: 1.5rem; }
+            .submit-btn { width: 150px; height: 150px; }
         }
     </style>
 </head>
 <body>
 
-    <div class="custom-cursor" id="cursor"></div>
+    <div class="preloader" id="preloader">
+        <div class="preloader-text">ANIMA Q</div>
+        <div class="preloader-counter" id="counter">0%</div>
+    </div>
+
+    <div class="cursor-dot" id="cursor-dot"></div>
+    <div class="cursor-outline" id="cursor-outline"></div>
+
     <div id="p5-container"></div>
 
-    <nav id="navbar">
-        <a href="#" class="logo interactive">ANIMA<span class="glowing-q">Q</span></a>
-        <div class="nav-links">
-            <a href="#menu" class="interactive">The Menu</a>
-            <a href="#booking" class="interactive">Reservations</a>
-            <a href="#about" class="interactive">Our Story</a>
-        </div>
-    </nav>
-
-    <section class="hero">
-        <h1 class="hero-title">ANIMA<span class="glowing-q">Q</span></h1>
-        <p class="hero-subtitle">The Soul of Modern Italy</p>
-    </section>
-
-    <section class="menu-section" id="menu">
-        <h2 class="section-header scroll-reveal">Curated Offerings</h2>
-        
-        <div class="menu-item scroll-reveal">
-            <div class="menu-img-wrapper">
-                <img src="https://images.unsplash.com/photo-1595295333158-4742f28fbd85?auto=format&fit=crop&w=1200&q=80" class="menu-img parallax" alt="Crudo di Mare">
-            </div>
-            <div class="menu-text">
-                <h3>Crudo di Mare</h3>
-                <p>Wild-caught Hokkaido scallops, cold-pressed olive oil, finger lime, and white balsamic caviar. A minimalist approach to raw purity.</p>
-                <span class="price">32</span>
-            </div>
-        </div>
-
-        <div class="menu-item scroll-reveal">
-            <div class="menu-img-wrapper">
-                <img src="https://images.unsplash.com/photo-1621996311239-531f0b503e5b?auto=format&fit=crop&w=1200&q=80" class="menu-img parallax" alt="Agnolotti del Plin">
-            </div>
-            <div class="menu-text">
-                <h3>Agnolotti del Plin</h3>
-                <p>Hand-pinched pasta parcels filled with slow-braised duck, finished in a sage-infused brown butter and 36-month Parmigiano Reggiano foam.</p>
-                <span class="price">44</span>
-            </div>
-        </div>
-    </section>
-
-    <section class="booking-section" id="booking">
-        <form class="booking-form scroll-reveal">
-            <h2 style="font-family: var(--font-body); font-weight: 300; text-transform: uppercase; letter-spacing: 6px; font-size: 1.5rem;">Secure Your Experience</h2>
-            <div class="form-group" style="margin-top: 3rem;">
-                <input type="text" placeholder="Nominate a Guest Name" required class="interactive">
-            </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <input type="date" required class="interactive" style="color: rgba(253,252,249,0.8);">
+    <div id="smooth-wrapper">
+        <div id="smooth-content">
+            
+            <nav>
+                <a href="#" class="logo magnetic-wrap"><span class="magnetic-item hover-target">ANIMA<span class="glowing-q">Q</span></span></a>
+                <div class="nav-links">
+                    <div class="magnetic-wrap"><a href="#menu" class="magnetic-item hover-target">Menu</a></div>
+                    <div class="magnetic-wrap"><a href="#booking" class="magnetic-item hover-target">Reserve</a></div>
                 </div>
-                <div class="form-group">
-                    <select required class="interactive" style="color: rgba(253,252,249,0.8);">
-                        <option value="" disabled selected>Party Size</option>
-                        <option value="2">Table for 2</option>
-                        <option value="3">Table for 3</option>
-                        <option value="4">Table for 4</option>
-                        <option value="5">Private Dining (5+)</option>
-                    </select>
-                </div>
-            </div>
-            <button type="button" class="submit-btn interactive">Request Reservation</button>
-        </form>
-    </section>
+            </nav>
 
-    <footer>
-        <div class="logo">ANIMA<span class="glowing-q">Q</span></div>
-        <p style="color: rgba(253,252,249,0.5); font-size: 0.9rem; margin-top: 1rem; letter-spacing: 1px;">Melbourne, VIC</p>
-    </footer>
+            <section class="hero">
+                <h1 class="hero-title" id="hero-title">
+                    <span>Contemporary</span>
+                    <span class="indent">Tradition.</span>
+                </h1>
+            </section>
+
+            <section class="menu-section" id="menu">
+                <div class="menu-header-sticky" id="menu-sticky">
+                    <h2>Curated.<br>Refined.</h2>
+                    <p>An exploration of Italian purity, viewed through an avant-garde lens. Local ingredients, flawless execution.</p>
+                </div>
+                
+                <div class="menu-gallery">
+                    <div class="menu-item">
+                        <div class="menu-img-container reveal-trigger">
+                            <img src="https://images.unsplash.com/photo-1595295333158-4742f28fbd85?auto=format&fit=crop&w=1600&q=80" class="menu-img parallax-img" alt="Crudo">
+                        </div>
+                        <div class="menu-info">
+                            <h3>Crudo di Mare</h3>
+                            <span>32</span>
+                        </div>
+                    </div>
+
+                    <div class="menu-item">
+                        <div class="menu-img-container reveal-trigger">
+                            <img src="https://images.unsplash.com/photo-1621996311239-531f0b503e5b?auto=format&fit=crop&w=1600&q=80" class="menu-img parallax-img" alt="Pasta">
+                        </div>
+                        <div class="menu-info">
+                            <h3>Agnolotti del Plin</h3>
+                            <span>44</span>
+                        </div>
+                    </div>
+
+                    <div class="menu-item">
+                        <div class="menu-img-container reveal-trigger">
+                            <img src="https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&w=1600&q=80" class="menu-img parallax-img" alt="Wagyu">
+                        </div>
+                        <div class="menu-info">
+                            <h3>Filetto di Wagyu</h3>
+                            <span>85</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="booking-section" id="booking">
+                <div class="booking-container">
+                    <h2 class="booking-title">Reserve</h2>
+                    <div class="input-row">
+                        <label>Guest</label>
+                        <input type="text" placeholder="Your Name" class="hover-target">
+                    </div>
+                    <div class="input-row">
+                        <label>Date</label>
+                        <input type="date" class="hover-target">
+                    </div>
+                    <div class="input-row">
+                        <label>Party</label>
+                        <select class="hover-target">
+                            <option value="" disabled selected>Select Size</option>
+                            <option value="2">Two Guests</option>
+                            <option value="4">Four Guests</option>
+                            <option value="6">Private Table</option>
+                        </select>
+                    </div>
+                    <div class="submit-wrap magnetic-wrap">
+                        <button class="submit-btn magnetic-item hover-target">Confirm</button>
+                    </div>
+                </div>
+            </section>
+
+            <footer>
+                Melbourne, VIC &mdash; &copy; 2026 ANIMA Q
+            </footer>
+
+        </div>
+    </div>
 
     <script>
-        // --- Custom Cursor ---
-        const cursor = document.getElementById('cursor');
-        const interactives = document.querySelectorAll('.interactive, a, button, input, select');
-
-        document.addEventListener('mousemove', (e) => {
-            if(window.matchMedia("(pointer: fine)").matches) {
-                cursor.style.left = e.clientX + 'px';
-                cursor.style.top = e.clientY + 'px';
+        // --- 1. Preloader ---
+        let count = 0;
+        const counterEl = document.getElementById('counter');
+        const preloader = document.getElementById('preloader');
+        const interval = setInterval(() => {
+            count += Math.floor(Math.random() * 10) + 1;
+            if (count >= 100) {
+                count = 100;
+                clearInterval(interval);
+                counterEl.innerText = count + '%';
+                setTimeout(() => {
+                    preloader.classList.add('hidden');
+                    document.getElementById('hero-title').style.opacity = 1;
+                    document.getElementById('hero-title').style.transform = 'translateY(0)';
+                    document.getElementById('hero-title').style.transition = 'all 1.5s cubic-bezier(0.165, 0.84, 0.44, 1) 0.5s';
+                }, 400);
+            } else {
+                counterEl.innerText = count + '%';
             }
+        }, 30);
+
+        // --- 2. Custom Smooth Scrolling (Lenis/Locomotive Style) ---
+        const body = document.body;
+        const smoothWrapper = document.getElementById('smooth-wrapper');
+        const smoothContent = document.getElementById('smooth-content');
+        
+        let currentScroll = 0;
+        let targetScroll = 0;
+        let scrollVelocity = 0;
+        
+        // Set body height to enable native scrollbar
+        function setBodyHeight() {
+            body.style.height = smoothContent.getBoundingClientRect().height + 'px';
+        }
+        window.addEventListener('load', setBodyHeight);
+        window.addEventListener('resize', setBodyHeight);
+
+        window.addEventListener('scroll', () => { targetScroll = window.scrollY; });
+
+        // --- 3. Custom Cursor & Magnetic Elements ---
+        const dot = document.getElementById('cursor-dot');
+        const outline = document.getElementById('cursor-outline');
+        let mouseX = window.innerWidth / 2; let mouseY = window.innerHeight / 2;
+        let outlineX = mouseX; let outlineY = mouseY;
+
+        window.addEventListener('mousemove', (e) => { mouseX = e.clientX; mouseY = e.clientY; });
+
+        document.querySelectorAll('.hover-target').forEach(el => {
+            el.addEventListener('mouseenter', () => { dot.classList.add('hover'); outline.classList.add('hover'); });
+            el.addEventListener('mouseleave', () => { dot.classList.remove('hover'); outline.classList.remove('hover'); });
         });
 
-        interactives.forEach(el => {
-            el.addEventListener('mouseenter', () => cursor.classList.add('hovering'));
-            el.addEventListener('mouseleave', () => cursor.classList.remove('hovering'));
+        document.querySelectorAll('.magnetic-wrap').forEach(wrap => {
+            const item = wrap.querySelector('.magnetic-item');
+            wrap.addEventListener('mousemove', (e) => {
+                const rect = wrap.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                item.style.transform = `translate(${x * 0.4}px, ${y * 0.4}px)`;
+            });
+            wrap.addEventListener('mouseleave', () => {
+                item.style.transform = `translate(0px, 0px)`;
+            });
         });
 
-        // --- Navbar Scroll Effect ---
-        const navbar = document.getElementById('navbar');
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 50) navbar.classList.add('scrolled');
-            else navbar.classList.remove('scrolled');
-        });
+        // --- 4. Main Render Loop (Scroll + Parallax + Cursor) ---
+        const parallaxImgs = document.querySelectorAll('.parallax-img');
+        const revealTriggers = document.querySelectorAll('.reveal-trigger');
+        const menuSticky = document.getElementById('menu-sticky');
+        const menuSection = document.getElementById('menu');
 
-        // --- Scroll Reveals (Includes Clip-Path Triggers) ---
-        const revealElements = document.querySelectorAll('.scroll-reveal');
-        const revealOnScroll = new IntersectionObserver((entries, observer) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                    observer.unobserve(entry.target);
+        function render() {
+            // Smooth Scroll LERP
+            currentScroll += (targetScroll - currentScroll) * 0.08;
+            scrollVelocity = targetScroll - currentScroll; // Pass this to WebGL
+            
+            // Apply translation & scroll velocity skew
+            smoothContent.style.transform = `translate3d(0, ${-currentScroll}px, 0) skewY(${scrollVelocity * 0.02}deg)`;
+
+            // Image Parallax & Reveal within Smooth Context
+            parallaxImgs.forEach((img, index) => {
+                const wrapper = revealTriggers[index];
+                const rect = wrapper.getBoundingClientRect(); // relative to viewport because of translate3d
+                if (rect.top < window.innerHeight && rect.bottom > 0) {
+                    wrapper.classList.add('in-view');
+                    const progress = (window.innerHeight - rect.top) / (window.innerHeight + rect.height);
+                    img.style.transform = `translate3d(0, ${-15 + (progress * 30)}%, 0) scale(1.1)`;
                 }
             });
-        }, { threshold: 0.2, rootMargin: "0px 0px -100px 0px" });
 
-        revealElements.forEach(el => revealOnScroll.observe(el));
-
-        // --- Smooth Parallax ---
-        const parallaxImages = document.querySelectorAll('.parallax');
-        window.addEventListener('scroll', () => {
-            parallaxImages.forEach(img => {
-                let rect = img.getBoundingClientRect();
-                if(rect.top < window.innerHeight && rect.bottom > 0) {
-                    img.style.transform = `translateY(${(rect.top - window.innerHeight/2) * 0.08}px)`;
+            // Sticky Menu Header Logic
+            const menuRect = menuSection.getBoundingClientRect();
+            if(window.innerWidth > 768) {
+                if (menuRect.top < 0 && menuRect.bottom > window.innerHeight) {
+                    menuSticky.style.transform = `translate3d(0, ${-menuRect.top}px, 0)`;
+                } else if (menuRect.top >= 0) {
+                    menuSticky.style.transform = `translate3d(0, 0, 0)`;
                 }
-            });
-        });
+            }
 
-        // --- Accurate & Reactive Moss WebGL Shader ---
+            // Cursor LERP
+            outlineX += (mouseX - outlineX) * 0.15;
+            outlineY += (mouseY - outlineY) * 0.15;
+            if(window.matchMedia("(pointer: fine)").matches) {
+                dot.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0)`;
+                outline.style.transform = `translate3d(${outlineX}px, ${outlineY}px, 0)`;
+            }
+
+            requestAnimationFrame(render);
+        }
+        render();
+
+        // --- 5. Advanced WebGL Shader (Reactive Moss/Liquid Gold) ---
         const vertexShader = `
             attribute vec3 aPosition;
             attribute vec2 aTexCoord;
             varying vec2 vTexCoord;
             void main() {
                 vTexCoord = aTexCoord;
-                vec4 pos = vec4(aPosition, 1.0);
-                pos.xy = pos.xy * 2.0 - 1.0;
-                gl_Position = pos;
+                gl_Position = vec4(aPosition, 1.0);
             }
         `;
 
@@ -507,81 +357,78 @@
             uniform vec2 u_resolution;
             uniform float u_time;
             uniform vec2 u_mouse;
+            uniform float u_scrollVel;
 
-            vec3 colorBg = vec3(0.06, 0.11, 0.08); 
-            vec3 colorMoss = vec3(0.18, 0.29, 0.21); 
-            vec3 colorHighlight = vec3(0.3, 0.45, 0.25);
-            vec3 colorGold = vec3(0.83, 0.69, 0.22);
-            
-            float random(vec2 st) {
-                return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);
-            }
+            vec3 cBase = vec3(0.04, 0.07, 0.05); // Darker base
+            vec3 cMoss = vec3(0.12, 0.22, 0.15); // Deep green
+            vec3 cGold = vec3(0.9, 0.77, 0.36);  // Accent gold
+
+            float random(vec2 st) { return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123); }
 
             float noise(vec2 st) {
-                vec2 i = floor(st);
-                vec2 f = fract(st);
-                float a = random(i);
-                float b = random(i + vec2(1.0, 0.0));
-                float c = random(i + vec2(0.0, 1.0));
-                float d = random(i + vec2(1.0, 1.0));
+                vec2 i = floor(st); vec2 f = fract(st);
+                float a = random(i); float b = random(i + vec2(1.0, 0.0));
+                float c = random(i + vec2(0.0, 1.0)); float d = random(i + vec2(1.0, 1.0));
                 vec2 u = f * f * (3.0 - 2.0 * f);
                 return mix(a, b, u.x) + (c - a)* u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
             }
 
             float fbm(vec2 st) {
-                float v = 0.0;
-                float a = 0.5;
-                vec2 shift = vec2(100.0);
-                mat2 rot = mat2(cos(0.5), sin(0.5), -sin(0.5), cos(0.50));
+                float v = 0.0; float a = 0.5;
+                mat2 rot = mat2(cos(0.5), sin(0.5), -sin(0.5), cos(0.5));
                 for (int i = 0; i < 5; ++i) {
-                    v += a * noise(st);
-                    st = rot * st * 2.0 + shift;
-                    a *= 0.5;
+                    v += a * noise(st); st = rot * st * 2.0 + vec2(100.0); a *= 0.5;
                 }
                 return v;
             }
 
             void main() {
                 vec2 st = gl_FragCoord.xy / u_resolution.xy;
-                float aspect = u_resolution.x / u_resolution.y;
-                st.x *= aspect;
+                st.x *= u_resolution.x / u_resolution.y;
 
                 vec2 mousePos = u_mouse / u_resolution.xy;
-                mousePos.x *= aspect;
+                mousePos.x *= u_resolution.x / u_resolution.y;
                 
-                // Tighter, more precise distance mapping
-                float distToMouse = distance(st, mousePos);
-                float mouseGlow = smoothstep(0.25, 0.0, distToMouse); // Shrunk radius for accuracy
+                // Tight spotlight on mouse
+                float dist = distance(st, mousePos);
+                float spotlight = smoothstep(0.2, 0.0, dist);
                 
-                vec2 distortion = normalize(st - mousePos) * mouseGlow * 0.05;
-                
+                // Distortion driven by both mouse and scroll velocity
+                vec2 distVector = normalize(st - mousePos) * spotlight * 0.1;
+                float scrollEffect = u_scrollVel * 0.005; 
+                st += distVector + vec2(0.0, scrollEffect);
+
+                // Fluid mechanics
                 vec2 q = vec2(0.);
-                q.x = fbm(st + distortion + u_time * 0.02);
-                q.y = fbm(st + distortion + vec2(1.0));
+                q.x = fbm(st + u_time * 0.02);
+                q.y = fbm(st + vec2(1.0) + u_time * 0.02);
 
                 vec2 r = vec2(0.);
-                r.x = fbm(st * 4.0 + q + u_time * 0.015);
-                r.y = fbm(st * 4.0 + q + vec2(8.3, 2.8) + u_time * 0.01);
+                r.x = fbm(st * 3.0 + q + u_time * 0.01 + scrollEffect);
+                r.y = fbm(st * 3.0 + q + vec2(8.3, 2.8) - scrollEffect);
 
-                float f = fbm(st * 3.0 + r);
+                float f = fbm(st * 2.0 + r);
 
-                vec3 color = mix(colorBg, colorMoss, f);
-                color = mix(color, colorHighlight, smoothstep(0.4, 0.8, f));
+                // Construct texture
+                vec3 color = mix(cBase, cMoss, clamp((f*f)*2.0, 0.0, 1.0));
                 
-                float goldFleck = smoothstep(0.75, 1.0, fbm(st * 15.0));
-                color = mix(color, colorGold, goldFleck * 0.4);
+                // Liquid gold marbling based on noise peaks
+                float goldMask = smoothstep(0.65, 0.9, fbm(st * 6.0 + r * 2.0));
+                color = mix(color, cGold, goldMask * 0.5);
 
-                // Spotlight overlay tightly bound to mouse
-                color += colorHighlight * mouseGlow * 0.6;
-                color += colorGold * mouseGlow * 0.15;
+                // Apply tight spotlight
+                color += cMoss * spotlight * 0.8;
+                color += cGold * spotlight * 0.3;
 
-                color += (random(st + u_time) - 0.5) * 0.03;
+                // Add grain
+                color += (random(st + u_time) - 0.5) * 0.04;
 
                 gl_FragColor = vec4(color, 1.0);
             }
         `;
 
         let theShader;
+        let shaderMouseX = 0, shaderMouseY = 0;
 
         function setup() {
             let canvas = createCanvas(windowWidth, windowHeight, WEBGL);
@@ -595,17 +442,20 @@
             theShader.setUniform("u_resolution", [width, height]);
             theShader.setUniform("u_time", millis() / 1000.0);
             
-            // Accurately pass mouse coordinates to shader
-            let mx = constrain(mouseX, 0, width);
-            let my = height - constrain(mouseY, 0, height); 
+            // LERP shader mouse for smoother spotlight rendering independent of main JS loop
+            shaderMouseX += (mouseX - shaderMouseX) * 0.1;
+            shaderMouseY += (mouseY - shaderMouseY) * 0.1;
+            
+            let mx = constrain(shaderMouseX, 0, width);
+            let my = height - constrain(shaderMouseY, 0, height); 
+            
             theShader.setUniform("u_mouse", [mx, my]);
+            theShader.setUniform("u_scrollVel", scrollVelocity); // Pass scroll velocity to distort fluid
 
-            rect(0, 0, width, height);
+            rect(-width/2, -height/2, width, height); // WebGL coordinates start at center
         }
 
-        function windowResized() {
-            resizeCanvas(windowWidth, windowHeight);
-        }
+        function windowResized() { resizeCanvas(windowWidth, windowHeight); setBodyHeight(); }
     </script>
 </body>
 </html>
