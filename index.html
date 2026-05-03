@@ -83,7 +83,16 @@
             mix-blend-mode: difference;
         }
         .logo { font-family: var(--font-heading); font-size: 1.5rem; color: #fff; text-decoration: none; letter-spacing: 6px; display: inline-block; font-weight: 300; }
-        .glowing-q { font-family: var(--font-body); font-weight: 200; margin-left: 2px; }
+        
+        /* Updated Glowing Q */
+        .glowing-q { 
+            color: var(--accent-gold);
+            font-family: var(--font-body); 
+            font-weight: 300; 
+            margin-left: 2px; 
+            text-shadow: 0 0 10px rgba(230, 197, 92, 0.5), 0 0 20px rgba(230, 197, 92, 0.25);
+        }
+        
         .nav-links { display: flex; gap: 4rem; }
         .magnetic-wrap { display: inline-block; padding: 10px; }
         .magnetic-item { display: inline-block; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); color: #fff; text-decoration: none; text-transform: uppercase; letter-spacing: 2px; font-size: 0.75rem; font-weight: 300; }
@@ -92,7 +101,7 @@
         .hero { height: 100vh; display: flex; flex-direction: column; justify-content: center; padding: 0 5%; position: relative; }
         .hero-title { font-family: var(--font-heading); font-size: clamp(3.5rem, 10vw, 10rem); line-height: 0.9; color: var(--text-light); font-weight: 300; text-transform: uppercase; mix-blend-mode: overlay; opacity: 0; transform: translateY(100px); letter-spacing: 2px; }
         .hero-title span { display: block; }
-        .hero-title .indent { margin-left: 15vw; color: var(--accent-gold); font-style: italic; mix-blend-mode: normal; }
+        .hero-title .indent { margin-left: 15vw; color: var(--accent-gold); font-style: italic; mix-blend-mode: normal; text-shadow: 0 0 15px rgba(230, 197, 92, 0.15); }
 
         /* --- ADVANCED MENU (HORIZONTAL SCROLL SIMULATION) --- */
         .menu-section { position: relative; padding: 15vh 0; }
@@ -194,7 +203,7 @@
 
                     <div class="menu-item">
                         <div class="menu-img-container reveal-trigger">
-                            <!-- Fixed, correctly working Unsplash image for Pasta -->
+                            <!-- Fixed Unsplash Image -->
                             <img src="https://images.unsplash.com/photo-1473093295043-cdd812d0e601?auto=format&fit=crop&w=1600&q=80" class="menu-img parallax-img" alt="Pasta">
                         </div>
                         <div class="menu-info">
@@ -280,7 +289,7 @@
         let targetScroll = 0;
         let scrollVelocity = 0;
         
-        // Resize Observer ensures body height is perfectly accurate even if images load slowly
+        // Resize Observer ensures body height is perfectly accurate even if images load slowly (fixes cut-offs)
         const resizeObserver = new ResizeObserver(() => {
             body.style.height = smoothContent.getBoundingClientRect().height + 'px';
         });
@@ -321,12 +330,12 @@
         const menuSection = document.getElementById('menu');
 
         function render() {
-            // Smooth Scroll LERP
-            currentScroll += (targetScroll - currentScroll) * 0.08;
+            // Stiffer LERP for a more grounded, less fluid/jelly feel
+            currentScroll += (targetScroll - currentScroll) * 0.25; 
             scrollVelocity = targetScroll - currentScroll; 
             
-            // Apply translation & scroll velocity skew
-            smoothContent.style.transform = `translate3d(0, ${-currentScroll}px, 0) skewY(${scrollVelocity * 0.02}deg)`;
+            // Apply straight translation (Skew removed for a more robust feel)
+            smoothContent.style.transform = `translate3d(0, ${-currentScroll}px, 0)`;
 
             // Image Parallax & Reveal within Smooth Context
             parallaxImgs.forEach((img, index) => {
@@ -364,13 +373,16 @@
         render();
 
         // --- 5. Advanced WebGL Shader (Reactive Moss/Liquid Gold) ---
+        // Added proper projection matrices to fix the "small box in center" issue
         const vertexShader = `
             attribute vec3 aPosition;
             attribute vec2 aTexCoord;
+            uniform mat4 uModelViewMatrix;
+            uniform mat4 uProjectionMatrix;
             varying vec2 vTexCoord;
             void main() {
                 vTexCoord = aTexCoord;
-                gl_Position = vec4(aPosition, 1.0);
+                gl_Position = uProjectionMatrix * uModelViewMatrix * vec4(aPosition, 1.0);
             }
         `;
 
@@ -381,9 +393,9 @@
             uniform vec2 u_mouse;
             uniform float u_scrollVel;
 
-            vec3 cBase = vec3(0.04, 0.07, 0.05); // Darker base
-            vec3 cMoss = vec3(0.12, 0.22, 0.15); // Deep green
-            vec3 cGold = vec3(0.9, 0.77, 0.36);  // Accent gold
+            vec3 cBase = vec3(0.04, 0.07, 0.05); 
+            vec3 cMoss = vec3(0.12, 0.22, 0.15); 
+            vec3 cGold = vec3(0.9, 0.77, 0.36);  
 
             float random(vec2 st) { return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123); }
 
@@ -434,7 +446,7 @@
                 // Construct texture
                 vec3 color = mix(cBase, cMoss, clamp((f*f)*2.0, 0.0, 1.0));
                 
-                // Liquid gold marbling based on noise peaks
+                // Liquid gold marbling
                 float goldMask = smoothstep(0.65, 0.9, fbm(st * 6.0 + r * 2.0));
                 color = mix(color, cGold, goldMask * 0.4);
 
@@ -456,6 +468,8 @@
         function setup() {
             let canvas = createCanvas(windowWidth, windowHeight, WEBGL);
             canvas.parent('p5-container');
+            // Setting pixelDensity to 1 prevents the canvas coordinates from mismatching the CSS sizing on Retina screens
+            pixelDensity(1); 
             theShader = createShader(vertexShader, fragmentShader);
             noStroke();
         }
@@ -475,8 +489,8 @@
             theShader.setUniform("u_mouse", [mx, my]);
             theShader.setUniform("u_scrollVel", scrollVelocity); 
 
-            // Using plane to ensure the entire background is covered flawlessly
-            plane(width, height); 
+            // Draws a rectangle from the center to fully cover the WebGL canvas
+            rect(-width/2, -height/2, width, height); 
         }
 
         function windowResized() { 
