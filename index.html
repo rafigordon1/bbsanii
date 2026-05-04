@@ -5,10 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ANIMA Q | Contemporary Italian</title>
     
-    <!-- Google Fonts: Ultra-Minimalist Editorial Combination -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
     
-    <!-- p5.js Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
     
     <style>
@@ -73,7 +71,7 @@
             overflow: hidden; z-index: 1; 
         }
         #smooth-content { 
-            width: 100%; will-change: transform; 
+            width: 100%; will-change: transform; position: relative;
         }
 
         /* --- NAVIGATION (MAGNETIC) --- */
@@ -84,7 +82,7 @@
         }
         .logo { font-family: var(--font-heading); font-size: 1.5rem; color: #fff; text-decoration: none; letter-spacing: 6px; display: inline-block; font-weight: 300; }
         
-        /* Updated Glowing Q */
+        /* Glowing Q */
         .glowing-q { 
             color: var(--accent-gold);
             font-family: var(--font-body); 
@@ -111,7 +109,7 @@
 
         .menu-gallery { display: flex; flex-direction: column; align-items: flex-end; padding-right: 5%; gap: 30vh; margin-top: 20vh; }
         
-        .menu-item { width: 55%; position: relative; display: flex; flex-direction: column; align-items: flex-start; }
+        .menu-item { width: 55%; position: relative; display: flex; flex-direction: column; align-items: flex-start; z-index: 2; }
         .menu-item:nth-child(even) { align-items: flex-end; width: 65%; margin-right: 10%; }
         
         .menu-img-container { width: 100%; height: 80vh; overflow: hidden; position: relative; clip-path: polygon(0 100%, 100% 100%, 100% 100%, 0 100%); transition: clip-path 1.5s cubic-bezier(0.77, 0, 0.175, 1); }
@@ -123,7 +121,7 @@
         .menu-info span { display: block; margin-top: 1rem; color: var(--accent-gold); font-family: var(--font-body); font-weight: 300; font-size: 1rem; letter-spacing: 2px; }
 
         /* --- BOOKING (MINIMALIST) --- */
-        .booking-section { min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 5%; position: relative; }
+        .booking-section { min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 5%; position: relative; z-index: 2; }
         .booking-container { width: 100%; max-width: 1000px; }
         .booking-title { font-family: var(--font-heading); font-weight: 300; font-size: clamp(3rem, 7vw, 5rem); color: var(--text-light); margin-bottom: 5rem; text-align: center; }
         
@@ -136,7 +134,37 @@
         .submit-btn { width: 180px; height: 180px; border-radius: 50%; background: transparent; border: 1px solid var(--accent-gold); color: var(--accent-gold); font-family: var(--font-body); font-weight: 300; text-transform: uppercase; letter-spacing: 2px; font-size: 0.85rem; cursor: pointer; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; justify-content: center; align-items: center; }
         .submit-btn:hover { background: var(--accent-gold); color: var(--bg-dark); transform: scale(0.95); }
 
-        footer { padding: 4rem 5%; text-align: center; font-family: var(--font-body); font-weight: 200; font-size: 0.75rem; letter-spacing: 4px; text-transform: uppercase; color: rgba(244, 240, 230, 0.4); mix-blend-mode: difference; }
+        footer { padding: 4rem 5%; text-align: center; font-family: var(--font-body); font-weight: 200; font-size: 0.75rem; letter-spacing: 4px; text-transform: uppercase; color: rgba(244, 240, 230, 0.4); mix-blend-mode: difference; position: relative; z-index: 2; }
+
+        /* --- CHARACTER ARTWORKS --- */
+        .character-art {
+            position: absolute;
+            z-index: 1;
+            pointer-events: none;
+            mix-blend-mode: screen; /* Removes the black background of the image */
+            opacity: 0.35; /* Subtle presence */
+            animation: organicFloat 8s ease-in-out infinite;
+        }
+        
+        .char-1 { top: 75vh; right: 5%; width: 25vw; max-width: 350px; }
+        .char-2 { top: 180vh; left: -5%; width: 30vw; max-width: 400px; transform: scaleX(-1); animation-delay: -2s; }
+        .char-3 { bottom: 15vh; right: 8%; width: 20vw; max-width: 300px; animation-delay: -4s; }
+
+        @keyframes organicFloat {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-30px) rotate(2deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+
+        /* Char-2 has a flipped scale, so we need a separate keyframe to maintain the flip */
+        .char-2 {
+            animation: organicFloatFlipped 9s ease-in-out infinite;
+        }
+        @keyframes organicFloatFlipped {
+            0% { transform: translateY(0px) scaleX(-1) rotate(0deg); }
+            50% { transform: translateY(-35px) scaleX(-1) rotate(-2deg); }
+            100% { transform: translateY(0px) scaleX(-1) rotate(0deg); }
+        }
 
         @media (max-width: 768px) {
             .nav-links { display: none; }
@@ -147,28 +175,29 @@
             .input-row { flex-direction: column; gap: 1rem; }
             .input-row input, .input-row select { font-size: 1.5rem; }
             .submit-btn { width: 140px; height: 140px; }
+            .character-art { opacity: 0.15; } /* Less intrusive on mobile */
         }
     </style>
 </head>
 <body>
 
-    <!-- Preloader -->
     <div class="preloader" id="preloader">
         <div class="preloader-text">ANIMA Q</div>
         <div class="preloader-counter" id="counter">0%</div>
     </div>
 
-    <!-- Custom Cursor -->
     <div class="cursor-dot" id="cursor-dot"></div>
     <div class="cursor-outline" id="cursor-outline"></div>
 
-    <!-- WebGL Background -->
     <div id="p5-container"></div>
 
-    <!-- Native Scroll Hijack Wrapper -->
     <div id="smooth-wrapper">
         <div id="smooth-content">
             
+            <img src="Untitled design.jpg" class="character-art char-1" alt="ANIMA Q Waiter Art">
+            <img src="Untitled design.jpg" class="character-art char-2" alt="ANIMA Q Waiter Art">
+            <img src="Untitled design.jpg" class="character-art char-3" alt="ANIMA Q Waiter Art">
+
             <nav>
                 <a href="#" class="logo magnetic-wrap"><span class="magnetic-item hover-target">ANIMA<span class="glowing-q">Q</span></span></a>
                 <div class="nav-links">
@@ -203,7 +232,6 @@
 
                     <div class="menu-item">
                         <div class="menu-img-container reveal-trigger">
-                            <!-- Fixed Unsplash Image -->
                             <img src="https://images.unsplash.com/photo-1473093295043-cdd812d0e601?auto=format&fit=crop&w=1600&q=80" class="menu-img parallax-img" alt="Pasta">
                         </div>
                         <div class="menu-info">
@@ -257,7 +285,6 @@
         </div>
     </div>
 
-    <!-- Scripts -->
     <script>
         // --- 1. Preloader ---
         let count = 0;
@@ -287,7 +314,6 @@
         
         let currentScroll = 0;
         let targetScroll = 0;
-        let scrollVelocity = 0;
         
         // Resize Observer ensures body height is perfectly accurate even if images load slowly (fixes cut-offs)
         const resizeObserver = new ResizeObserver(() => {
@@ -332,7 +358,6 @@
         function render() {
             // Stiffer LERP for a more grounded, less fluid/jelly feel
             currentScroll += (targetScroll - currentScroll) * 0.25; 
-            scrollVelocity = targetScroll - currentScroll; 
             
             // Apply straight translation (Skew removed for a more robust feel)
             smoothContent.style.transform = `translate3d(0, ${-currentScroll}px, 0)`;
@@ -373,7 +398,7 @@
         render();
 
         // --- 5. Advanced WebGL Shader (Reactive Moss/Liquid Gold) ---
-        // Added proper projection matrices to fix the "small box in center" issue
+        // Projection matrices strictly lock the geometry avoiding cutoffs
         const vertexShader = `
             attribute vec3 aPosition;
             attribute vec2 aTexCoord;
@@ -391,7 +416,6 @@
             uniform vec2 u_resolution;
             uniform float u_time;
             uniform vec2 u_mouse;
-            uniform float u_scrollVel;
 
             vec3 cBase = vec3(0.04, 0.07, 0.05); 
             vec3 cMoss = vec3(0.12, 0.22, 0.15); 
@@ -427,10 +451,9 @@
                 float dist = distance(st, mousePos);
                 float spotlight = smoothstep(0.25, 0.0, dist);
                 
-                // Distortion driven by both mouse and scroll velocity
+                // Distortion driven by mouse only (scroll interaction removed to stop jitter)
                 vec2 distVector = normalize(st - mousePos) * spotlight * 0.1;
-                float scrollEffect = u_scrollVel * 0.005; 
-                st += distVector + vec2(0.0, scrollEffect);
+                st += distVector;
 
                 // Fluid mechanics
                 vec2 q = vec2(0.);
@@ -438,8 +461,8 @@
                 q.y = fbm(st + vec2(1.0) + u_time * 0.02);
 
                 vec2 r = vec2(0.);
-                r.x = fbm(st * 3.0 + q + u_time * 0.01 + scrollEffect);
-                r.y = fbm(st * 3.0 + q + vec2(8.3, 2.8) - scrollEffect);
+                r.x = fbm(st * 3.0 + q + u_time * 0.01);
+                r.y = fbm(st * 3.0 + q + vec2(8.3, 2.8));
 
                 float f = fbm(st * 2.0 + r);
 
@@ -468,7 +491,7 @@
         function setup() {
             let canvas = createCanvas(windowWidth, windowHeight, WEBGL);
             canvas.parent('p5-container');
-            // Setting pixelDensity to 1 prevents the canvas coordinates from mismatching the CSS sizing on Retina screens
+            // Prevent coordinates shrinking mismatching on retina screens
             pixelDensity(1); 
             theShader = createShader(vertexShader, fragmentShader);
             noStroke();
@@ -487,9 +510,8 @@
             let my = height - constrain(shaderMouseY, 0, height); 
             
             theShader.setUniform("u_mouse", [mx, my]);
-            theShader.setUniform("u_scrollVel", scrollVelocity); 
 
-            // Draws a rectangle from the center to fully cover the WebGL canvas
+            // Draws a rectangle to fully cover the WebGL canvas
             rect(-width/2, -height/2, width, height); 
         }
 
