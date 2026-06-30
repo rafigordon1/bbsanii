@@ -76,13 +76,18 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
         input {
             width: 100%;
             padding: 18px 24px;
-            margin-bottom: 20px;
             border: 1px solid var(--glass-border);
             border-radius: 16px;
-            background: rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.5);
             font-family: inherit;
             font-size: 1.1rem;
             color: var(--text-main);
@@ -93,7 +98,7 @@
         }
 
         input:focus { 
-            background: rgba(255, 255, 255, 0.7); 
+            background: rgba(255, 255, 255, 0.8); 
             border-color: #fff;
             box-shadow: 0 0 15px rgba(255,255,255,0.5);
         }
@@ -141,26 +146,30 @@
 
         button:hover { background: #fff; transform: scale(1.02); }
         
-        .save-btn {
-            width: 100%;
-            margin-top: 20px;
+        .primary-btn {
             background: #d4f0df; 
             padding: 18px;
             font-size: 1.1rem;
             border: none;
+            flex-shrink: 0;
         }
 
-        .save-btn:hover { background: #c1ebcf; }
+        .primary-btn:hover { background: #c1ebcf; }
+        
+        .save-btn { width: 100%; margin-top: 20px; }
 
+        /* Dragonfly setup */
         #dragonfly {
             position: fixed;
+            top: 0;
+            left: 0;
             width: 150px;
             height: 150px;
             pointer-events: none;
-            z-index: 5;
-            transition: transform 3s cubic-bezier(0.25, 0.1, 0.25, 1);
-            opacity: 0.8;
-            filter: drop-shadow(0px 10px 15px rgba(0,0,0,0.1));
+            z-index: 100; /* Ensures it floats above everything */
+            transition: transform 4s cubic-bezier(0.25, 0.1, 0.25, 1);
+            opacity: 0.85;
+            filter: drop-shadow(0px 15px 25px rgba(0,0,0,0.15));
         }
         
         .wing-top-left { animation: flapTop 0.08s infinite alternate linear; transform-origin: 50% 50%; }
@@ -184,16 +193,16 @@
         <g transform="translate(100, 100)">
             <defs>
                 <linearGradient id="wingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" style="stop-color:rgba(238, 204, 255, 0.6); stop-opacity:1" />
-                    <stop offset="100%" style="stop-color:rgba(187, 255, 238, 0.3); stop-opacity:1" />
+                    <stop offset="0%" style="stop-color:rgba(238, 204, 255, 0.7); stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:rgba(187, 255, 238, 0.4); stop-opacity:1" />
                 </linearGradient>
             </defs>
             
-            <path class="wing-top-left" d="M -5 -15 C -40 -60, -90 -50, -95 -20 C -100 10, -30 0, -5 -5 Z" fill="url(#wingGrad)" stroke="rgba(255,255,255,0.5)" stroke-width="1"/>
-            <path class="wing-top-right" d="M 5 -15 C 40 -60, 90 -50, 95 -20 C 100 10, 30 0, 5 -5 Z" fill="url(#wingGrad)" stroke="rgba(255,255,255,0.5)" stroke-width="1"/>
+            <path class="wing-top-left" d="M -5 -15 C -40 -60, -90 -50, -95 -20 C -100 10, -30 0, -5 -5 Z" fill="url(#wingGrad)" stroke="rgba(255,255,255,0.6)" stroke-width="1.5"/>
+            <path class="wing-top-right" d="M 5 -15 C 40 -60, 90 -50, 95 -20 C 100 10, 30 0, 5 -5 Z" fill="url(#wingGrad)" stroke="rgba(255,255,255,0.6)" stroke-width="1.5"/>
             
-            <path class="wing-bot-left" d="M -5 5 C -30 -10, -75 10, -70 40 C -65 70, -20 20, -5 15 Z" fill="url(#wingGrad)" stroke="rgba(255,255,255,0.4)" stroke-width="1"/>
-            <path class="wing-bot-right" d="M 5 5 C 30 -10, 75 10, 70 40 C 65 70, 20 20, 5 15 Z" fill="url(#wingGrad)" stroke="rgba(255,255,255,0.4)" stroke-width="1"/>
+            <path class="wing-bot-left" d="M -5 5 C -30 -10, -75 10, -70 40 C -65 70, -20 20, -5 15 Z" fill="url(#wingGrad)" stroke="rgba(255,255,255,0.5)" stroke-width="1.5"/>
+            <path class="wing-bot-right" d="M 5 5 C 30 -10, 75 10, 70 40 C 65 70, 20 20, 5 15 Z" fill="url(#wingGrad)" stroke="rgba(255,255,255,0.5)" stroke-width="1.5"/>
 
             <path d="M -3 20 Q 0 90 3 20 Z" fill="#6a8788"/>
             <path d="M -2 40 Q 0 95 2 40 Z" fill="#50696a"/>
@@ -209,7 +218,11 @@
     <div class="wrapper">
         <div class="container">
             <div id="login-view" class="view-section active">
-                <input type="password" id="password-input" placeholder="Enter password..." />
+                <div class="input-group">
+                    <input type="password" id="password-input" placeholder="Enter password..." autocomplete="off" />
+                    <button class="primary-btn" id="login-btn">Enter</button>
+                </div>
+                <p id="login-error" style="color: #ff5252; text-align: center; display: none; margin-top: 0;">Incorrect password</p>
             </div>
 
             <div id="user-view" class="view-section">
@@ -222,12 +235,12 @@
                 
                 <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--glass-border);">
                     <h4 style="margin-top: 0; color: #555;">Add New Link</h4>
-                    <input type="text" id="new-title" placeholder="Track Title" />
-                    <input type="url" id="new-url" placeholder="https://..." />
-                    <button id="add-track-btn" style="width: 100%; padding: 16px; font-size: 1.1rem;">Add Track</button>
+                    <input type="text" id="new-title" placeholder="Track Title" style="margin-bottom: 15px;" />
+                    <input type="url" id="new-url" placeholder="https://..." style="margin-bottom: 15px;" />
+                    <button id="add-track-btn" class="primary-btn" style="width: 100%;">Add Track</button>
                 </div>
                 
-                <button class="save-btn" id="save-live-btn">Save Changes to Live Site</button>
+                <button class="primary-btn save-btn" id="save-live-btn">Save Changes to Live Site</button>
             </div>
         </div>
     </div>
@@ -236,6 +249,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
+        // Your exact Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyAu7vFYtKtrebLerG4RYq-iLTANXz2G88Y",
             authDomain: "bbsanii.firebaseapp.com",
@@ -245,9 +259,14 @@
             appId: "1:266818867019:web:c70c482f19f318ddb322ce"
         };
 
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+        // Initialize Firebase safely
+        let db;
+        try {
+            const app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+        } catch (error) {
+            console.error("Firebase init error:", error);
+        }
 
         const defaultLinks = [
             { title: "2hrs & 2more hrs", url: "https://untitled.stream/library/project/QSMuAATjgMVMxumwuIWkz" }
@@ -256,51 +275,67 @@
         let links = [];
 
         async function fetchGlobalLinks() {
+            if (!db) return defaultLinks;
             try {
                 const docRef = doc(db, 'demos', 'linkList');
                 const docSnap = await getDoc(docRef);
                 if (docSnap.exists()) {
                     return docSnap.data().links;
-                } else {
-                    return defaultLinks;
                 }
             } catch (error) {
                 console.error("Error fetching:", error);
-                return defaultLinks; 
             }
+            return defaultLinks; 
         }
 
         async function saveGlobalLinks(newLinksArray) {
+            if (!db) return alert("Database not connected properly.");
             try {
                 const docRef = doc(db, 'demos', 'linkList');
                 await setDoc(docRef, { links: newLinksArray });
             } catch (error) {
                 console.error("Error saving:", error);
-                alert("Failed to save. Make sure your Firestore rules allow read/writes.");
+                alert("Failed to save. Check Firestore security rules (Start in Test Mode).");
             }
         }
 
+        // DOM Elements
         const loginView = document.getElementById('login-view');
         const userView = document.getElementById('user-view');
         const adminView = document.getElementById('admin-view');
         const passInput = document.getElementById('password-input');
+        const loginBtn = document.getElementById('login-btn');
+        const loginError = document.getElementById('login-error');
         const publicList = document.getElementById('public-link-list');
         const adminList = document.getElementById('admin-link-list');
 
-        window.onload = async () => {
+        // Load data on start
+        window.addEventListener('DOMContentLoaded', async () => {
             links = await fetchGlobalLinks();
-        };
+        });
 
-        passInput.addEventListener('input', (e) => {
-            const val = e.target.value.toLowerCase();
+        // Robust Password Logic
+        function checkPassword() {
+            const val = passInput.value.toLowerCase().trim();
+            loginError.style.display = 'none';
+
             if (val === 'dragonfly') {
                 showView(userView);
                 renderUserLinks();
-            } else if (val === 'dragonflyowner') {
+                passInput.value = '';
+            } else if (val === 'owner') {
                 showView(adminView);
                 renderAdminLinks();
+                passInput.value = '';
+            } else if (val.length > 0 && event.type === 'click') {
+                // Only show error if they actively clicked the button with a wrong password
+                loginError.style.display = 'block';
             }
-        });
+        }
+
+        passInput.addEventListener('input', checkPassword);
+        passInput.addEventListener('keyup', (e) => { if(e.key === 'Enter') checkPassword(); });
+        loginBtn.addEventListener('click', checkPassword);
 
         function showView(view) {
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
@@ -325,89 +360,4 @@
                 li.style.transform = 'none';
                 li.style.boxShadow = 'none';
                 
-                const titleSpan = document.createElement('span');
-                titleSpan.style.cssText = "overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 45%;";
-                titleSpan.textContent = link.title;
-
-                const controlsDiv = document.createElement('div');
-                controlsDiv.className = 'admin-controls';
-
-                const upBtn = document.createElement('button');
-                upBtn.textContent = '↑';
-                if(index === 0) upBtn.disabled = true;
-                upBtn.onclick = () => move(index, -1);
-
-                const downBtn = document.createElement('button');
-                downBtn.textContent = '↓';
-                if(index === links.length - 1) downBtn.disabled = true;
-                downBtn.onclick = () => move(index, 1);
-
-                const delBtn = document.createElement('button');
-                delBtn.textContent = '✕';
-                delBtn.style.cssText = "color: #ff5252; border-color: rgba(255,82,82,0.3);";
-                delBtn.onclick = () => removeLink(index);
-
-                controlsDiv.appendChild(upBtn);
-                controlsDiv.appendChild(downBtn);
-                controlsDiv.appendChild(delBtn);
-                li.appendChild(titleSpan);
-                li.appendChild(controlsDiv);
-                adminList.appendChild(li);
-            });
-        }
-
-        function addLink() {
-            const title = document.getElementById('new-title').value;
-            const url = document.getElementById('new-url').value;
-            if (title && url) {
-                links.push({ title, url });
-                document.getElementById('new-title').value = '';
-                document.getElementById('new-url').value = '';
-                renderAdminLinks();
-            }
-        }
-
-        function removeLink(index) {
-            links.splice(index, 1);
-            renderAdminLinks();
-        }
-
-        function move(index, direction) {
-            const newIndex = index + direction;
-            if (newIndex >= 0 && newIndex < links.length) {
-                const temp = links[index];
-                links[index] = links[newIndex];
-                links[newIndex] = temp;
-                renderAdminLinks();
-            }
-        }
-
-        async function saveAdminChanges() {
-            const btn = document.getElementById('save-live-btn');
-            btn.innerText = "Saving...";
-            await saveGlobalLinks(links);
-            btn.innerText = "Saved!";
-            setTimeout(() => { btn.innerText = "Save Changes to Live Site"; }, 2000);
-            renderUserLinks();
-        }
-
-        document.getElementById('add-track-btn').onclick = addLink;
-        document.getElementById('save-live-btn').onclick = saveAdminChanges;
-
-        const dragonfly = document.getElementById('dragonfly');
-        function moveDragonfly() {
-            const padding = 100;
-            const x = padding + Math.random() * (window.innerWidth - padding * 2);
-            const y = padding + Math.random() * (window.innerHeight - padding * 2);
-            const rect = dragonfly.getBoundingClientRect();
-            const dx = x - rect.left;
-            const dy = y - rect.top;
-            const angle = Math.atan2(dy, dx) * 180 / Math.PI;
-            dragonfly.style.transform = `translate(${x}px, ${y}px) rotate(${angle + 90}deg)`;
-        }
-
-        setTimeout(moveDragonfly, 100);
-        setInterval(moveDragonfly, 4000);
-    </script>
-</body>
-</html>
+                const title
