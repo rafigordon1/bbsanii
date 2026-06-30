@@ -7,13 +7,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Sacramento&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* Pastel gradient matching the uploaded aesthetic */
-            --bg-gradient: radial-gradient(circle at 50% 50%, #e8f5e9, #fce4ec, #e3f2fd);
-            --glass-bg: rgba(255, 255, 255, 0.3);
-            --glass-border: rgba(255, 255, 255, 0.5);
-            --text-main: #4a4a4a;
-            --text-light: #7a7a7a;
-            --accent: #b2dfdb;
+            --bg-gradient: radial-gradient(circle at 50% 50%, #f4ebf2, #e5f0f9, #e8f5e9);
+            --glass-bg: rgba(255, 255, 255, 0.15);
+            --glass-border: rgba(255, 255, 255, 0.4);
+            --text-main: #2d2d2d;
+            --accent: #a2d5c6;
         }
 
         body, html {
@@ -23,7 +21,7 @@
             font-family: 'Inter', sans-serif;
             background: var(--bg-gradient);
             background-size: 200% 200%;
-            animation: gradientShift 15s ease infinite;
+            animation: gradientShift 20s ease infinite;
             color: var(--text-main);
             display: flex;
             flex-direction: column;
@@ -39,177 +37,249 @@
 
         .header-title {
             font-family: 'Sacramento', cursive;
-            font-size: 4rem;
-            margin: 3rem 0 1rem;
-            color: #555;
-            text-shadow: 2px 2px 4px rgba(255,255,255,0.8);
+            font-size: clamp(3rem, 6vw, 5rem);
+            margin: 4rem 0 2rem;
+            color: #444;
+            text-shadow: 2px 2px 8px rgba(255,255,255,0.9);
+            z-index: 10;
+            text-align: center;
+        }
+
+        .wrapper {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            padding: 0 20px;
+            box-sizing: border-box;
             z-index: 10;
         }
 
         .container {
-            width: 90%;
-            max-width: 600px;
+            width: 100%;
+            max-width: 800px;
             background: var(--glass-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            padding: 2rem;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
-            margin-bottom: 3rem;
-            z-index: 10;
-            transition: all 0.3s ease;
+            border-radius: 30px;
+            padding: clamp(2rem, 5vw, 4rem);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.03);
+            margin-bottom: 4rem;
+            transition: all 0.4s ease;
         }
 
         .view-section { display: none; }
-        .view-section.active { display: block; animation: fadeIn 0.5s ease; }
+        .view-section.active { display: block; animation: fadeIn 0.6s ease forwards; }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+            from { opacity: 0; transform: translateY(15px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        input[type="password"], input[type="text"], input[type="url"] {
+        input {
             width: 100%;
-            padding: 15px;
-            margin-bottom: 15px;
+            padding: 18px 24px;
+            margin-bottom: 20px;
             border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            background: rgba(255, 255, 255, 0.5);
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.4);
             font-family: inherit;
-            font-size: 1rem;
+            font-size: 1.1rem;
             color: var(--text-main);
             outline: none;
             box-sizing: border-box;
-            transition: background 0.3s;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
         }
 
-        input:focus { background: rgba(255, 255, 255, 0.8); }
-
-        .link-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
+        input:focus { 
+            background: rgba(255, 255, 255, 0.7); 
+            border-color: #fff;
+            box-shadow: 0 0 15px rgba(255,255,255,0.5);
         }
 
+        .link-list { list-style: none; padding: 0; margin: 0; }
+        
         .link-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 20px;
-            margin-bottom: 12px;
-            background: rgba(255, 255, 255, 0.6);
-            border-radius: 12px;
+            padding: 20px 25px;
+            margin-bottom: 15px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 16px;
             text-decoration: none;
             color: var(--text-main);
             font-weight: 600;
-            transition: transform 0.2s, box-shadow 0.2s;
+            font-size: 1.1rem;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            border: 1px solid transparent;
         }
 
         .link-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            transform: translateY(-4px);
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            border-color: #fff;
         }
 
-        .admin-controls {
-            display: flex;
-            gap: 8px;
-        }
+        .link-item span.arrow { color: #888; font-weight: 300; }
 
+        .admin-controls { display: flex; gap: 10px; }
+        
         button {
-            background: rgba(255, 255, 255, 0.7);
+            background: rgba(255, 255, 255, 0.8);
             border: 1px solid var(--glass-border);
-            padding: 10px 15px;
-            border-radius: 8px;
+            padding: 12px 20px;
+            border-radius: 12px;
             cursor: pointer;
             font-weight: 600;
             color: var(--text-main);
-            transition: background 0.2s;
+            transition: all 0.2s;
+            font-family: inherit;
         }
 
-        button:hover { background: white; }
+        button:hover { background: #fff; transform: scale(1.02); }
         
         .save-btn {
             width: 100%;
-            margin-top: 15px;
-            background: #d0f0c0; /* soft green */
-            padding: 15px;
+            margin-top: 20px;
+            background: #d4f0df; 
+            padding: 18px;
             font-size: 1.1rem;
+            border: none;
         }
 
-        .save-btn:hover { background: #bdf0a8; }
+        .save-btn:hover { background: #c1ebcf; }
 
-        /* Dragonfly Graphic */
         #dragonfly {
-            position: absolute;
-            width: 60px;
-            height: 60px;
+            position: fixed;
+            width: 150px;
+            height: 150px;
             pointer-events: none;
             z-index: 5;
-            transition: transform 2s ease-in-out;
-            opacity: 0.7;
+            transition: transform 3s cubic-bezier(0.25, 0.1, 0.25, 1);
+            opacity: 0.8;
+            filter: drop-shadow(0px 10px 15px rgba(0,0,0,0.1));
         }
         
-        .wing {
-            animation: flap 0.1s infinite alternate linear;
-            transform-origin: center;
-        }
+        .wing-top-left { animation: flapTop 0.08s infinite alternate linear; transform-origin: 50% 50%; }
+        .wing-top-right { animation: flapTop 0.08s infinite alternate linear; transform-origin: 50% 50%; }
+        .wing-bot-left { animation: flapBot 0.09s infinite alternate linear; transform-origin: 50% 50%; }
+        .wing-bot-right { animation: flapBot 0.09s infinite alternate linear; transform-origin: 50% 50%; }
 
-        @keyframes flap {
-            0% { transform: scaleY(1); }
-            100% { transform: scaleY(0.4); }
+        @keyframes flapTop {
+            0% { transform: rotate(15deg) scaleY(1); }
+            100% { transform: rotate(-10deg) scaleY(0.2); }
+        }
+        @keyframes flapBot {
+            0% { transform: rotate(-15deg) scaleY(1); }
+            100% { transform: rotate(10deg) scaleY(0.2); }
         }
     </style>
 </head>
 <body>
 
-    <svg id="dragonfly" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-        <g fill="#a2d5c6">
-            <rect x="48" y="10" width="4" height="80" rx="2" fill="#7a9e9f"/>
-            <ellipse class="wing" cx="30" cy="35" rx="20" ry="8" fill="rgba(244, 204, 216, 0.8)"/>
-            <ellipse class="wing" cx="70" cy="35" rx="20" ry="8" fill="rgba(244, 204, 216, 0.8)"/>
-            <ellipse class="wing" cx="35" cy="50" rx="15" ry="6" fill="rgba(196, 230, 243, 0.8)"/>
-            <ellipse class="wing" cx="65" cy="50" rx="15" ry="6" fill="rgba(196, 230, 243, 0.8)"/>
+    <svg id="dragonfly" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <g transform="translate(100, 100)">
+            <defs>
+                <linearGradient id="wingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:rgba(238, 204, 255, 0.6); stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:rgba(187, 255, 238, 0.3); stop-opacity:1" />
+                </linearGradient>
+            </defs>
+            
+            <path class="wing-top-left" d="M -5 -15 C -40 -60, -90 -50, -95 -20 C -100 10, -30 0, -5 -5 Z" fill="url(#wingGrad)" stroke="rgba(255,255,255,0.5)" stroke-width="1"/>
+            <path class="wing-top-right" d="M 5 -15 C 40 -60, 90 -50, 95 -20 C 100 10, 30 0, 5 -5 Z" fill="url(#wingGrad)" stroke="rgba(255,255,255,0.5)" stroke-width="1"/>
+            
+            <path class="wing-bot-left" d="M -5 5 C -30 -10, -75 10, -70 40 C -65 70, -20 20, -5 15 Z" fill="url(#wingGrad)" stroke="rgba(255,255,255,0.4)" stroke-width="1"/>
+            <path class="wing-bot-right" d="M 5 5 C 30 -10, 75 10, 70 40 C 65 70, 20 20, 5 15 Z" fill="url(#wingGrad)" stroke="rgba(255,255,255,0.4)" stroke-width="1"/>
+
+            <path d="M -3 20 Q 0 90 3 20 Z" fill="#6a8788"/>
+            <path d="M -2 40 Q 0 95 2 40 Z" fill="#50696a"/>
+            <ellipse cx="0" cy="5" rx="6" ry="18" fill="#4a6364"/>
+            <circle cx="0" cy="-18" r="7" fill="#3a4d4e"/>
+            <circle cx="-3" cy="-20" r="3" fill="#1a2526"/>
+            <circle cx="3" cy="-20" r="3" fill="#1a2526"/>
         </g>
     </svg>
 
     <h1 class="header-title">bbsanii's demos</h1>
 
-    <div class="container">
-        <div id="login-view" class="view-section active">
-            <input type="password" id="password-input" placeholder="Enter password to listen..." />
-        </div>
-
-        <div id="user-view" class="view-section">
-            <ul class="link-list" id="public-link-list">
-                </ul>
-        </div>
-
-        <div id="admin-view" class="view-section">
-            <h3>Manage Demos</h3>
-            <ul class="link-list" id="admin-link-list">
-                </ul>
-            
-            <div style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--glass-border);">
-                <h4>Add New Link</h4>
-                <input type="text" id="new-title" placeholder="Track Title" />
-                <input type="url" id="new-url" placeholder="https://..." />
-                <button onclick="addLink()" style="width: 100%;">Add Track</button>
+    <div class="wrapper">
+        <div class="container">
+            <div id="login-view" class="view-section active">
+                <input type="password" id="password-input" placeholder="Enter password..." />
             </div>
-            
-            <button class="save-btn" onclick="saveAdminChanges()">Save Changes</button>
+
+            <div id="user-view" class="view-section">
+                <ul class="link-list" id="public-link-list"></ul>
+            </div>
+
+            <div id="admin-view" class="view-section">
+                <h3 style="margin-top: 0; color: #555;">Manage Demos</h3>
+                <ul class="link-list" id="admin-link-list"></ul>
+                
+                <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--glass-border);">
+                    <h4 style="margin-top: 0; color: #555;">Add New Link</h4>
+                    <input type="text" id="new-title" placeholder="Track Title" />
+                    <input type="url" id="new-url" placeholder="https://..." />
+                    <button id="add-track-btn" style="width: 100%; padding: 16px; font-size: 1.1rem;">Add Track</button>
+                </div>
+                
+                <button class="save-btn" id="save-live-btn">Save Changes to Live Site</button>
+            </div>
         </div>
     </div>
 
-    <script>
-        // Data State
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAu7vFYtKtrebLerG4RYq-iLTANXz2G88Y",
+            authDomain: "bbsanii.firebaseapp.com",
+            projectId: "bbsanii",
+            storageBucket: "bbsanii.firebasestorage.app",
+            messagingSenderId: "266818867019",
+            appId: "1:266818867019:web:c70c482f19f318ddb322ce"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
         const defaultLinks = [
             { title: "2hrs & 2more hrs", url: "https://untitled.stream/library/project/QSMuAATjgMVMxumwuIWkz" }
         ];
 
-        let links = JSON.parse(localStorage.getItem('bbsanii_demos')) || defaultLinks;
+        let links = [];
 
-        // Elements
+        async function fetchGlobalLinks() {
+            try {
+                const docRef = doc(db, 'demos', 'linkList');
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    return docSnap.data().links;
+                } else {
+                    return defaultLinks;
+                }
+            } catch (error) {
+                console.error("Error fetching:", error);
+                return defaultLinks; 
+            }
+        }
+
+        async function saveGlobalLinks(newLinksArray) {
+            try {
+                const docRef = doc(db, 'demos', 'linkList');
+                await setDoc(docRef, { links: newLinksArray });
+            } catch (error) {
+                console.error("Error saving:", error);
+                alert("Failed to save. Make sure your Firestore rules allow read/writes.");
+            }
+        }
+
         const loginView = document.getElementById('login-view');
         const userView = document.getElementById('user-view');
         const adminView = document.getElementById('admin-view');
@@ -217,17 +287,18 @@
         const publicList = document.getElementById('public-link-list');
         const adminList = document.getElementById('admin-link-list');
 
-        // Routing Logic
+        window.onload = async () => {
+            links = await fetchGlobalLinks();
+        };
+
         passInput.addEventListener('input', (e) => {
             const val = e.target.value.toLowerCase();
             if (val === 'dragonfly') {
                 showView(userView);
                 renderUserLinks();
-                stopDragonfly(); // Hide dragonfly on inner pages
-            } else if (val === 'owner') {
+            } else if (val === 'dragonflyowner') {
                 showView(adminView);
                 renderAdminLinks();
-                stopDragonfly();
             }
         });
 
@@ -236,12 +307,11 @@
             view.classList.add('active');
         }
 
-        // Render Functions
         function renderUserLinks() {
             publicList.innerHTML = '';
             links.forEach(link => {
                 const li = document.createElement('li');
-                li.innerHTML = `<a href="${link.url}" target="_blank" class="link-item">${link.title} <span>↗</span></a>`;
+                li.innerHTML = `<a href="${link.url}" target="_blank" class="link-item">${link.title} <span class="arrow">↗</span></a>`;
                 publicList.appendChild(li);
             });
         }
@@ -251,19 +321,41 @@
             links.forEach((link, index) => {
                 const li = document.createElement('li');
                 li.className = 'link-item';
-                li.innerHTML = `
-                    <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 50%;">${link.title}</span>
-                    <div class="admin-controls">
-                        <button onclick="move(${index}, -1)" ${index === 0 ? 'disabled' : ''}>↑</button>
-                        <button onclick="move(${index}, 1)" ${index === links.length - 1 ? 'disabled' : ''}>↓</button>
-                        <button onclick="removeLink(${index})" style="color: #ff6b6b;">✕</button>
-                    </div>
-                `;
+                li.style.cursor = 'default';
+                li.style.transform = 'none';
+                li.style.boxShadow = 'none';
+                
+                const titleSpan = document.createElement('span');
+                titleSpan.style.cssText = "overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 45%;";
+                titleSpan.textContent = link.title;
+
+                const controlsDiv = document.createElement('div');
+                controlsDiv.className = 'admin-controls';
+
+                const upBtn = document.createElement('button');
+                upBtn.textContent = '↑';
+                if(index === 0) upBtn.disabled = true;
+                upBtn.onclick = () => move(index, -1);
+
+                const downBtn = document.createElement('button');
+                downBtn.textContent = '↓';
+                if(index === links.length - 1) downBtn.disabled = true;
+                downBtn.onclick = () => move(index, 1);
+
+                const delBtn = document.createElement('button');
+                delBtn.textContent = '✕';
+                delBtn.style.cssText = "color: #ff5252; border-color: rgba(255,82,82,0.3);";
+                delBtn.onclick = () => removeLink(index);
+
+                controlsDiv.appendChild(upBtn);
+                controlsDiv.appendChild(downBtn);
+                controlsDiv.appendChild(delBtn);
+                li.appendChild(titleSpan);
+                li.appendChild(controlsDiv);
                 adminList.appendChild(li);
             });
         }
 
-        // Admin Actions
         function addLink() {
             const title = document.getElementById('new-title').value;
             const url = document.getElementById('new-url').value;
@@ -290,42 +382,32 @@
             }
         }
 
-        function saveAdminChanges() {
-            localStorage.setItem('bbsanii_demos', JSON.stringify(links));
-            alert("Changes saved locally!");
-            // Update the user view array automatically
+        async function saveAdminChanges() {
+            const btn = document.getElementById('save-live-btn');
+            btn.innerText = "Saving...";
+            await saveGlobalLinks(links);
+            btn.innerText = "Saved!";
+            setTimeout(() => { btn.innerText = "Save Changes to Live Site"; }, 2000);
             renderUserLinks();
         }
 
-        // Dragonfly Animation Logic
-        const dragonfly = document.getElementById('dragonfly');
-        let dragonflyInterval;
+        document.getElementById('add-track-btn').onclick = addLink;
+        document.getElementById('save-live-btn').onclick = saveAdminChanges;
 
+        const dragonfly = document.getElementById('dragonfly');
         function moveDragonfly() {
-            const x = Math.random() * (window.innerWidth - 100);
-            const y = Math.random() * (window.innerHeight - 100);
-            
-            // Calculate rotation based on direction
+            const padding = 100;
+            const x = padding + Math.random() * (window.innerWidth - padding * 2);
+            const y = padding + Math.random() * (window.innerHeight - padding * 2);
             const rect = dragonfly.getBoundingClientRect();
             const dx = x - rect.left;
             const dy = y - rect.top;
             const angle = Math.atan2(dy, dx) * 180 / Math.PI;
-
             dragonfly.style.transform = `translate(${x}px, ${y}px) rotate(${angle + 90}deg)`;
         }
 
-        function startDragonfly() {
-            moveDragonfly();
-            dragonflyInterval = setInterval(moveDragonfly, 3000);
-        }
-
-        function stopDragonfly() {
-            clearInterval(dragonflyInterval);
-            dragonfly.style.display = 'none';
-        }
-
-        // Initialize
-        startDragonfly();
+        setTimeout(moveDragonfly, 100);
+        setInterval(moveDragonfly, 4000);
     </script>
 </body>
 </html>
