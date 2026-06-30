@@ -11,58 +11,252 @@
             --glass-bg: rgba(255, 255, 255, 0.15);
             --glass-border: rgba(255, 255, 255, 0.4);
             --text-main: #2d2d2d;
+            --accent: #a2d5c6;
         }
 
         body, html {
-            margin: 0; padding: 0; min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
             font-family: 'Inter', sans-serif;
             background: var(--bg-gradient);
             background-size: 200% 200%;
             animation: gradientShift 20s ease infinite;
-            display: flex; flex-direction: column; align-items: center;
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
         }
 
-        @keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
 
-        .container {
-            width: 90%; max-width: 600px; margin-top: 10vh;
-            background: var(--glass-bg); backdrop-filter: blur(20px);
-            border-radius: 30px; padding: 3rem; text-align: center;
+        .header-title {
+            font-family: 'Sacramento', cursive;
+            font-size: clamp(3rem, 6vw, 5rem);
+            margin: 4rem 0 2rem;
+            color: #444;
+            text-shadow: 2px 2px 8px rgba(255,255,255,0.9);
+            z-index: 10;
+            text-align: center;
+        }
+
+        .wrapper {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            padding: 0 20px;
+            box-sizing: border-box;
             z-index: 10;
         }
 
-        .view-section { display: none; }
-        .view-section.active { display: block; }
-
-        input {
-            width: 100%; padding: 15px; border-radius: 12px; border: 1px solid var(--glass-border);
-            margin-bottom: 10px; background: rgba(255, 255, 255, 0.5);
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 30px;
+            padding: clamp(2rem, 5vw, 4rem);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.03);
+            margin-bottom: 4rem;
+            transition: all 0.4s ease;
         }
 
+        .view-section { display: none; }
+        .view-section.active { display: block; animation: fadeIn 0.6s ease forwards; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        input {
+            width: 100%;
+            padding: 18px 24px;
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.5);
+            font-family: inherit;
+            font-size: 1.1rem;
+            color: var(--text-main);
+            outline: none;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        input:focus { 
+            background: rgba(255, 255, 255, 0.8); 
+            border-color: #fff;
+            box-shadow: 0 0 15px rgba(255,255,255,0.5);
+        }
+
+        .link-list { list-style: none; padding: 0; margin: 0; }
+        
+        .link-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 25px;
+            margin-bottom: 15px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 16px;
+            text-decoration: none;
+            color: var(--text-main);
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            border: 1px solid transparent;
+        }
+
+        .link-item:hover {
+            transform: translateY(-4px);
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            border-color: #fff;
+        }
+
+        .link-item span.arrow { color: #888; font-weight: 300; }
+
+        .admin-controls { display: flex; gap: 10px; }
+        
+        button {
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid var(--glass-border);
+            padding: 12px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text-main);
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        button:hover { background: #fff; transform: scale(1.02); }
+        
+        .primary-btn {
+            background: #d4f0df; 
+            padding: 18px;
+            font-size: 1.1rem;
+            border: none;
+            flex-shrink: 0;
+        }
+
+        .primary-btn:hover { background: #c1ebcf; }
+        
+        .save-btn { width: 100%; margin-top: 20px; }
+
+        /* Dragonfly setup */
         #dragonfly {
-            position: fixed; top: 0; left: 0; width: 120px; z-index: 999;
-            pointer-events: none; transition: transform 3s linear;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 150px;
+            height: 150px;
+            pointer-events: none;
+            z-index: 100; /* Ensures it floats above everything */
+            transition: transform 4s cubic-bezier(0.25, 0.1, 0.25, 1);
+            opacity: 0.85;
+            filter: drop-shadow(0px 15px 25px rgba(0,0,0,0.15));
+        }
+        
+        .wing-top-left { animation: flapTop 0.08s infinite alternate linear; transform-origin: 50% 50%; }
+        .wing-top-right { animation: flapTop 0.08s infinite alternate linear; transform-origin: 50% 50%; }
+        .wing-bot-left { animation: flapBot 0.09s infinite alternate linear; transform-origin: 50% 50%; }
+        .wing-bot-right { animation: flapBot 0.09s infinite alternate linear; transform-origin: 50% 50%; }
+
+        @keyframes flapTop {
+            0% { transform: rotate(15deg) scaleY(1); }
+            100% { transform: rotate(-10deg) scaleY(0.2); }
+        }
+        @keyframes flapBot {
+            0% { transform: rotate(-15deg) scaleY(1); }
+            100% { transform: rotate(10deg) scaleY(0.2); }
         }
     </style>
 </head>
 <body>
 
-    <svg id="dragonfly" viewBox="0 0 200 200">
-        <path d="M 0 50 Q 50 0 100 50 Q 50 100 0 50 Z" fill="#a2d5c6"/>
+    <svg id="dragonfly" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <g transform="translate(100, 100)">
+            <defs>
+                <linearGradient id="wingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:rgba(238, 204, 255, 0.7); stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:rgba(187, 255, 238, 0.4); stop-opacity:1" />
+                </linearGradient>
+            </defs>
+            
+            <path class="wing-top-left" d="M -5 -15 C -40 -60, -90 -50, -95 -20 C -100 10, -30 0, -5 -5 Z" fill="url(#wingGrad)" stroke="rgba(255,255,255,0.6)" stroke-width="1.5"/>
+            <path class="wing-top-right" d="M 5 -15 C 40 -60, 90 -50, 95 -20 C 100 10, 30 0, 5 -5 Z" fill="url(#wingGrad)" stroke="rgba(255,255,255,0.6)" stroke-width="1.5"/>
+            
+            <path class="wing-bot-left" d="M -5 5 C -30 -10, -75 10, -70 40 C -65 70, -20 20, -5 15 Z" fill="url(#wingGrad)" stroke="rgba(255,255,255,0.5)" stroke-width="1.5"/>
+            <path class="wing-bot-right" d="M 5 5 C 30 -10, 75 10, 70 40 C 65 70, 20 20, 5 15 Z" fill="url(#wingGrad)" stroke="rgba(255,255,255,0.5)" stroke-width="1.5"/>
+
+            <path d="M -3 20 Q 0 90 3 20 Z" fill="#6a8788"/>
+            <path d="M -2 40 Q 0 95 2 40 Z" fill="#50696a"/>
+            <ellipse cx="0" cy="5" rx="6" ry="18" fill="#4a6364"/>
+            <circle cx="0" cy="-18" r="7" fill="#3a4d4e"/>
+            <circle cx="-3" cy="-20" r="3" fill="#1a2526"/>
+            <circle cx="3" cy="-20" r="3" fill="#1a2526"/>
+        </g>
     </svg>
 
-    <div class="container">
-        <div id="login-view" class="view-section active">
-            <input type="password" id="pass" placeholder="Enter password..." />
-            <button id="btn">Enter</button>
+    <h1 class="header-title">bbsanii's demos</h1>
+
+    <div class="wrapper">
+        <div class="container">
+            <div id="login-view" class="view-section active">
+                <div class="input-group">
+                    <input type="password" id="password-input" placeholder="Enter password..." autocomplete="off" />
+                    <button class="primary-btn" id="login-btn">Enter</button>
+                </div>
+                <p id="login-error" style="color: #ff5252; text-align: center; display: none; margin-top: 0;">Incorrect password</p>
+            </div>
+
+            <div id="user-view" class="view-section">
+                <ul class="link-list" id="public-link-list"></ul>
+            </div>
+
+            <div id="admin-view" class="view-section">
+                <h3 style="margin-top: 0; color: #555;">Manage Demos</h3>
+                <ul class="link-list" id="admin-link-list"></ul>
+                
+                <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--glass-border);">
+                    <h4 style="margin-top: 0; color: #555;">Add New Link</h4>
+                    <input type="text" id="new-title" placeholder="Track Title" style="margin-bottom: 15px;" />
+                    <input type="url" id="new-url" placeholder="https://..." style="margin-bottom: 15px;" />
+                    <button id="add-track-btn" class="primary-btn" style="width: 100%;">Add Track</button>
+                </div>
+                
+                <button class="primary-btn save-btn" id="save-live-btn">Save Changes to Live Site</button>
+            </div>
         </div>
-        <div id="user-view" class="view-section"><h2>User Area</h2><ul id="list"></ul></div>
-        <div id="admin-view" class="view-section"><h2>Admin Area</h2><ul id="admin-list"></ul></div>
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        /* ---------------------------------------------------------------
+           NOTE ON THE FIX:
+           Firebase is now loaded with a *dynamic* import() inside a
+           try/catch, instead of a static top-of-file import. A static
+           import that fails (network restriction, ad-blocker, CDN
+           hiccup, etc.) kills the ENTIRE module silently — nothing below
+           it runs, which is why the password check and the dragonfly
+           animation both appeared dead. Dynamic import isolates that
+           failure so the rest of the page always works, with or without
+           a working Firebase connection.
+        --------------------------------------------------------------- */
 
         const firebaseConfig = {
             apiKey: "AIzaSyAu7vFYtKtrebLerG4RYq-iLTANXz2G88Y",
@@ -73,37 +267,212 @@
             appId: "1:266818867019:web:c70c482f19f318ddb322ce"
         };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+        const defaultLinks = [
+            { title: "2hrs & 2more hrs", url: "https://untitled.stream/library/project/QSMuAATjgMVMxumwuIWkz" }
+        ];
 
-        // --- PASSWORD LOGIC ---
-        document.addEventListener('DOMContentLoaded', () => {
-            const btn = document.getElementById('btn');
-            const pass = document.getElementById('pass');
-            
-            btn.onclick = () => {
-                const val = pass.value.toLowerCase().trim();
-                if(val === 'dragonfly') {
-                    document.getElementById('login-view').classList.remove('active');
-                    document.getElementById('user-view').classList.add('active');
-                } else if(val === 'owner') {
-                    document.getElementById('login-view').classList.remove('active');
-                    document.getElementById('admin-view').classList.add('active');
-                } else {
-                    alert("Incorrect password");
-                }
-            };
+        // Start with defaults immediately so the UI is never blocked
+        // waiting on a network request.
+        let links = [...defaultLinks];
+        let db = null;
+        let firestoreFns = null;
 
-            // --- DRAGONFLY MOVEMENT ---
-            const df = document.getElementById('dragonfly');
-            function move() {
-                const x = Math.random() * (window.innerWidth - 150);
-                const y = Math.random() * (window.innerHeight - 150);
-                df.style.transform = `translate(${x}px, ${y}px)`;
+        // DOM Elements
+        const loginView = document.getElementById('login-view');
+        const userView = document.getElementById('user-view');
+        const adminView = document.getElementById('admin-view');
+        const passInput = document.getElementById('password-input');
+        const loginBtn = document.getElementById('login-btn');
+        const loginError = document.getElementById('login-error');
+        const publicList = document.getElementById('public-link-list');
+        const adminList = document.getElementById('admin-link-list');
+
+        let currentView = 'login'; // 'login' | 'user' | 'admin'
+
+        function showView(view, name) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            view.classList.add('active');
+            currentView = name;
+        }
+
+        // ---------- Password logic (fixed: no reliance on global `event`) ----------
+        function attemptLogin(showErrorOnFail) {
+            const val = passInput.value.toLowerCase().trim();
+            loginError.style.display = 'none';
+
+            if (val === 'dragonfly') {
+                showView(userView, 'user');
+                renderUserLinks();
+                passInput.value = '';
+            } else if (val === 'owner') {
+                showView(adminView, 'admin');
+                renderAdminLinks();
+                passInput.value = '';
+            } else if (val.length > 0 && showErrorOnFail) {
+                loginError.style.display = 'block';
             }
-            setInterval(move, 3000);
-            move();
-        });
+        }
+
+        passInput.addEventListener('input', () => attemptLogin(false));
+        passInput.addEventListener('keyup', (e) => { if (e.key === 'Enter') attemptLogin(true); });
+        loginBtn.addEventListener('click', () => attemptLogin(true));
+
+        // ---------- Rendering ----------
+        function renderUserLinks() {
+            publicList.innerHTML = '';
+            links.forEach(link => {
+                const li = document.createElement('li');
+                li.innerHTML = `<a href="${link.url}" target="_blank" rel="noopener" class="link-item">${link.title} <span class="arrow">↗</span></a>`;
+                publicList.appendChild(li);
+            });
+        }
+
+        function renderAdminLinks() {
+            adminList.innerHTML = '';
+            links.forEach((link, index) => {
+                const li = document.createElement('li');
+                li.className = 'link-item';
+                li.style.cursor = 'default';
+                li.style.transform = 'none';
+                li.style.boxShadow = 'none';
+
+                const titleSpan = document.createElement('span');
+                titleSpan.style.cssText = "overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 45%;";
+                titleSpan.textContent = link.title;
+
+                const controlsDiv = document.createElement('div');
+                controlsDiv.className = 'admin-controls';
+
+                const upBtn = document.createElement('button');
+                upBtn.textContent = '↑';
+                if (index === 0) upBtn.disabled = true;
+                upBtn.onclick = () => move(index, -1);
+
+                const downBtn = document.createElement('button');
+                downBtn.textContent = '↓';
+                if (index === links.length - 1) downBtn.disabled = true;
+                downBtn.onclick = () => move(index, 1);
+
+                const delBtn = document.createElement('button');
+                delBtn.textContent = '✕';
+                delBtn.style.cssText = "color: #ff5252; border-color: rgba(255,82,82,0.3);";
+                delBtn.onclick = () => removeLink(index);
+
+                controlsDiv.appendChild(upBtn);
+                controlsDiv.appendChild(downBtn);
+                controlsDiv.appendChild(delBtn);
+                li.appendChild(titleSpan);
+                li.appendChild(controlsDiv);
+                adminList.appendChild(li);
+            });
+        }
+
+        function addLink() {
+            const title = document.getElementById('new-title').value;
+            const url = document.getElementById('new-url').value;
+            if (title && url) {
+                links.push({ title, url });
+                document.getElementById('new-title').value = '';
+                document.getElementById('new-url').value = '';
+                renderAdminLinks();
+            }
+        }
+
+        function removeLink(index) {
+            links.splice(index, 1);
+            renderAdminLinks();
+        }
+
+        function move(index, direction) {
+            const newIndex = index + direction;
+            if (newIndex >= 0 && newIndex < links.length) {
+                const temp = links[index];
+                links[index] = links[newIndex];
+                links[newIndex] = temp;
+                renderAdminLinks();
+            }
+        }
+
+        async function saveAdminChanges() {
+            const btn = document.getElementById('save-live-btn');
+            btn.innerText = "Saving...";
+            const ok = await saveGlobalLinks(links);
+            btn.innerText = ok ? "Saved!" : "Save failed";
+            setTimeout(() => { btn.innerText = "Save Changes to Live Site"; }, 2000);
+            renderUserLinks();
+        }
+
+        document.getElementById('add-track-btn').addEventListener('click', addLink);
+        document.getElementById('save-live-btn').addEventListener('click', saveAdminChanges);
+
+        // ---------- Firebase (loaded async, never blocks the page) ----------
+        async function initFirebase() {
+            try {
+                const [{ initializeApp }, firestore] = await Promise.all([
+                    import("https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js"),
+                    import("https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js")
+                ]);
+                const { getFirestore, doc, getDoc, setDoc } = firestore;
+                firestoreFns = { doc, getDoc, setDoc };
+
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+
+                // Pull live data once Firebase is ready, then re-render
+                // whichever view is currently visible.
+                const docRef = doc(db, 'demos', 'linkList');
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists() && Array.isArray(docSnap.data().links)) {
+                    links = docSnap.data().links;
+                    if (currentView === 'user') renderUserLinks();
+                    if (currentView === 'admin') renderAdminLinks();
+                }
+            } catch (error) {
+                // Network blocked, CDN unreachable, bad config, etc.
+                // The site keeps working off defaultLinks regardless.
+                console.error("Firebase unavailable, using local links:", error);
+                db = null;
+            }
+        }
+
+        async function saveGlobalLinks(newLinksArray) {
+            if (!db || !firestoreFns) {
+                alert("Database not connected — changes are only saved for this session.");
+                return false;
+            }
+            try {
+                const { doc, setDoc } = firestoreFns;
+                const docRef = doc(db, 'demos', 'linkList');
+                await setDoc(docRef, { links: newLinksArray });
+                return true;
+            } catch (error) {
+                console.error("Error saving:", error);
+                alert("Failed to save. Check Firestore security rules (Start in Test Mode).");
+                return false;
+            }
+        }
+
+        // Kick off Firebase loading in the background — does not block
+        // password entry, dragonfly animation, or anything else.
+        initFirebase();
+
+        // ---------- Continuous Dragonfly Movement ----------
+        const dragonfly = document.getElementById('dragonfly');
+        function moveDragonfly() {
+            const padding = 120;
+            const x = Math.max(0, Math.random() * (window.innerWidth - padding));
+            const y = Math.max(0, Math.random() * (window.innerHeight - padding));
+
+            const rect = dragonfly.getBoundingClientRect();
+            const dx = x - rect.left;
+            const dy = y - rect.top;
+            const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+
+            dragonfly.style.transform = `translate(${x}px, ${y}px) rotate(${angle + 90}deg)`;
+        }
+
+        setTimeout(moveDragonfly, 100);
+        setInterval(moveDragonfly, 4000);
     </script>
 </body>
 </html>
