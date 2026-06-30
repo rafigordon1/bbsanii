@@ -3,521 +3,329 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ANIMA Q | Contemporary Italian</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
-    
+    <title>bbsanii's demos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sacramento&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-dark: #09120c; 
-            --primary-green: #14281a;
-            --accent-gold: #e6c55c;
-            --accent-gold-dim: #a68a35;
-            --text-light: #f4f0e6;
-            --font-heading: 'Cormorant Garamond', serif;
-            --font-body: 'Inter', sans-serif;
+            /* Pastel gradient matching the uploaded aesthetic */
+            --bg-gradient: radial-gradient(circle at 50% 50%, #e8f5e9, #fce4ec, #e3f2fd);
+            --glass-bg: rgba(255, 255, 255, 0.3);
+            --glass-border: rgba(255, 255, 255, 0.5);
+            --text-main: #4a4a4a;
+            --text-light: #7a7a7a;
+            --accent: #b2dfdb;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
         body, html {
-            background-color: var(--bg-dark);
-            color: var(--text-light);
-            font-family: var(--font-body);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-gradient);
+            background-size: 200% 200%;
+            animation: gradientShift 15s ease infinite;
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             overflow-x: hidden;
-            overscroll-behavior: none;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
         }
 
-        @media (pointer: fine) { body { cursor: none; } }
-
-        /* --- PRELOADER --- */
-        .preloader {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: var(--bg-dark); z-index: 10000;
-            display: flex; justify-content: center; align-items: center;
-            flex-direction: column; transition: transform 1.2s cubic-bezier(0.77, 0, 0.175, 1);
-        }
-        .preloader-text {
-            font-family: var(--font-heading); font-size: 3rem; color: var(--accent-gold);
-            letter-spacing: 12px; font-weight: 300; text-transform: uppercase; overflow: hidden;
-        }
-        .preloader-counter { margin-top: 1rem; font-size: 0.8rem; letter-spacing: 5px; color: var(--text-light); font-weight: 200; }
-        .preloader.hidden { transform: translateY(-100%); }
-
-        /* --- CUSTOM CURSOR --- */
-        .cursor-dot, .cursor-outline {
-            position: fixed; top: 0; left: 0; transform: translate(-50%, -50%);
-            border-radius: 50%; pointer-events: none; z-index: 9999;
-        }
-        .cursor-dot { width: 5px; height: 5px; background: var(--accent-gold); transition: width 0.3s, height 0.3s; }
-        .cursor-outline { width: 35px; height: 35px; border: 1px solid rgba(230, 197, 92, 0.5); transition: width 0.4s, height 0.4s, background 0.4s; }
-        .cursor-dot.hover { width: 0; height: 0; }
-        .cursor-outline.hover { width: 70px; height: 70px; background: rgba(230, 197, 92, 0.05); backdrop-filter: blur(2px); border-color: transparent; }
-
-        /* --- WEBGL & SMOOTH SCROLL WRAPPER --- */
-        #p5-container { 
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; 
-            z-index: 0; pointer-events: none; 
-        }
-        #p5-container canvas { 
-            display: block; width: 100vw !important; height: 100vh !important; 
-        }
-        #smooth-wrapper { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            overflow: hidden; z-index: 1; 
-        }
-        #smooth-content { 
-            width: 100%; will-change: transform; position: relative;
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
-        /* --- NAVIGATION (MAGNETIC) --- */
-        nav {
-            position: fixed; top: 0; width: 100%; padding: 2.5rem 5%;
-            display: flex; justify-content: space-between; align-items: center; z-index: 100;
-            mix-blend-mode: difference;
+        .header-title {
+            font-family: 'Sacramento', cursive;
+            font-size: 4rem;
+            margin: 3rem 0 1rem;
+            color: #555;
+            text-shadow: 2px 2px 4px rgba(255,255,255,0.8);
+            z-index: 10;
         }
-        .logo { font-family: var(--font-heading); font-size: 1.5rem; color: #fff; text-decoration: none; letter-spacing: 6px; display: inline-block; font-weight: 300; }
+
+        .container {
+            width: 90%;
+            max-width: 600px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+            margin-bottom: 3rem;
+            z-index: 10;
+            transition: all 0.3s ease;
+        }
+
+        .view-section { display: none; }
+        .view-section.active { display: block; animation: fadeIn 0.5s ease; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        input[type="password"], input[type="text"], input[type="url"] {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.5);
+            font-family: inherit;
+            font-size: 1rem;
+            color: var(--text-main);
+            outline: none;
+            box-sizing: border-box;
+            transition: background 0.3s;
+        }
+
+        input:focus { background: rgba(255, 255, 255, 0.8); }
+
+        .link-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .link-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            margin-bottom: 12px;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 12px;
+            text-decoration: none;
+            color: var(--text-main);
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .link-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .admin-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        button {
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid var(--glass-border);
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text-main);
+            transition: background 0.2s;
+        }
+
+        button:hover { background: white; }
         
-        /* Glowing Q */
-        .glowing-q { 
-            color: var(--accent-gold);
-            font-family: var(--font-body); 
-            font-weight: 300; 
-            margin-left: 2px; 
-            text-shadow: 0 0 10px rgba(230, 197, 92, 0.5), 0 0 20px rgba(230, 197, 92, 0.25);
+        .save-btn {
+            width: 100%;
+            margin-top: 15px;
+            background: #d0f0c0; /* soft green */
+            padding: 15px;
+            font-size: 1.1rem;
         }
-        
-        .nav-links { display: flex; gap: 4rem; }
-        .magnetic-wrap { display: inline-block; padding: 10px; }
-        .magnetic-item { display: inline-block; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); color: #fff; text-decoration: none; text-transform: uppercase; letter-spacing: 2px; font-size: 0.75rem; font-weight: 300; }
 
-        /* --- HERO --- */
-        .hero { height: 100vh; display: flex; flex-direction: column; justify-content: center; padding: 0 5%; position: relative; }
-        .hero-title { font-family: var(--font-heading); font-size: clamp(3.5rem, 10vw, 10rem); line-height: 0.9; color: var(--text-light); font-weight: 300; text-transform: uppercase; mix-blend-mode: overlay; opacity: 0; transform: translateY(100px); letter-spacing: 2px; }
-        .hero-title span { display: block; }
-        .hero-title .indent { margin-left: 15vw; color: var(--accent-gold); font-style: italic; mix-blend-mode: normal; text-shadow: 0 0 15px rgba(230, 197, 92, 0.15); }
+        .save-btn:hover { background: #bdf0a8; }
 
-        /* --- ADVANCED MENU (HORIZONTAL SCROLL SIMULATION) --- */
-        .menu-section { position: relative; padding: 15vh 0; }
-        .menu-header-sticky { position: absolute; top: 15vh; left: 5%; width: 30%; z-index: 10; }
-        .menu-header-sticky h2 { font-family: var(--font-heading); font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 300; color: var(--accent-gold); font-style: italic; line-height: 1.1; margin-bottom: 2rem; }
-        .menu-header-sticky p { font-size: 0.9rem; font-weight: 300; line-height: 1.8; color: rgba(244, 240, 230, 0.6); max-width: 300px; }
-
-        .menu-gallery { display: flex; flex-direction: column; align-items: flex-end; padding-right: 5%; gap: 30vh; margin-top: 20vh; }
-        
-        .menu-item { width: 55%; position: relative; display: flex; flex-direction: column; align-items: flex-start; z-index: 2; }
-        .menu-item:nth-child(even) { align-items: flex-end; width: 65%; margin-right: 10%; }
-        
-        .menu-img-container { width: 100%; height: 80vh; overflow: hidden; position: relative; clip-path: polygon(0 100%, 100% 100%, 100% 100%, 0 100%); transition: clip-path 1.5s cubic-bezier(0.77, 0, 0.175, 1); }
-        .menu-img-container.in-view { clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); }
-        .menu-img { width: 100%; height: 130%; object-fit: cover; transform: translateY(-15%); will-change: transform; filter: brightness(0.8) contrast(1.1); }
-        
-        .menu-info { margin-top: 2rem; mix-blend-mode: difference; }
-        .menu-info h3 { font-family: var(--font-heading); font-weight: 300; font-size: clamp(2rem, 4vw, 3.5rem); color: #fff; letter-spacing: 1px; }
-        .menu-info span { display: block; margin-top: 1rem; color: var(--accent-gold); font-family: var(--font-body); font-weight: 300; font-size: 1rem; letter-spacing: 2px; }
-
-        /* --- BOOKING (MINIMALIST) --- */
-        .booking-section { min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 5%; position: relative; z-index: 2; }
-        .booking-container { width: 100%; max-width: 1000px; }
-        .booking-title { font-family: var(--font-heading); font-weight: 300; font-size: clamp(3rem, 7vw, 5rem); color: var(--text-light); margin-bottom: 5rem; text-align: center; }
-        
-        .input-row { display: flex; border-bottom: 1px solid rgba(230, 197, 92, 0.2); padding: 2rem 0; transition: border-color 0.4s; position: relative; }
-        .input-row:hover, .input-row:focus-within { border-bottom-color: var(--accent-gold); }
-        .input-row label { flex: 1; font-family: var(--font-body); font-size: 0.9rem; font-weight: 300; color: rgba(244, 240, 230, 0.5); text-transform: uppercase; letter-spacing: 4px; display: flex; align-items: center; }
-        .input-row input, .input-row select { flex: 2; background: transparent; border: none; color: var(--accent-gold); font-family: var(--font-heading); font-weight: 300; font-size: 1.8rem; outline: none; font-style: italic; }
-        
-        .submit-wrap { display: flex; justify-content: flex-end; margin-top: 4rem; }
-        .submit-btn { width: 180px; height: 180px; border-radius: 50%; background: transparent; border: 1px solid var(--accent-gold); color: var(--accent-gold); font-family: var(--font-body); font-weight: 300; text-transform: uppercase; letter-spacing: 2px; font-size: 0.85rem; cursor: pointer; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; justify-content: center; align-items: center; }
-        .submit-btn:hover { background: var(--accent-gold); color: var(--bg-dark); transform: scale(0.95); }
-
-        footer { padding: 4rem 5%; text-align: center; font-family: var(--font-body); font-weight: 200; font-size: 0.75rem; letter-spacing: 4px; text-transform: uppercase; color: rgba(244, 240, 230, 0.4); mix-blend-mode: difference; position: relative; z-index: 2; }
-
-        /* --- CHARACTER ARTWORKS --- */
-        .character-art {
+        /* Dragonfly Graphic */
+        #dragonfly {
             position: absolute;
-            z-index: 1;
+            width: 60px;
+            height: 60px;
             pointer-events: none;
-            mix-blend-mode: screen; /* Removes the black background of the image */
-            opacity: 0.35; /* Subtle presence */
-            animation: organicFloat 8s ease-in-out infinite;
+            z-index: 5;
+            transition: transform 2s ease-in-out;
+            opacity: 0.7;
         }
         
-        .char-1 { top: 75vh; right: 5%; width: 25vw; max-width: 350px; }
-        .char-2 { top: 180vh; left: -5%; width: 30vw; max-width: 400px; transform: scaleX(-1); animation-delay: -2s; }
-        .char-3 { bottom: 15vh; right: 8%; width: 20vw; max-width: 300px; animation-delay: -4s; }
-
-        @keyframes organicFloat {
-            0% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-30px) rotate(2deg); }
-            100% { transform: translateY(0px) rotate(0deg); }
+        .wing {
+            animation: flap 0.1s infinite alternate linear;
+            transform-origin: center;
         }
 
-        /* Char-2 has a flipped scale, so we need a separate keyframe to maintain the flip */
-        .char-2 {
-            animation: organicFloatFlipped 9s ease-in-out infinite;
-        }
-        @keyframes organicFloatFlipped {
-            0% { transform: translateY(0px) scaleX(-1) rotate(0deg); }
-            50% { transform: translateY(-35px) scaleX(-1) rotate(-2deg); }
-            100% { transform: translateY(0px) scaleX(-1) rotate(0deg); }
-        }
-
-        @media (max-width: 768px) {
-            .nav-links { display: none; }
-            .menu-header-sticky { position: relative; width: 100%; top: 0; left: 0; margin-bottom: 4rem; }
-            .menu-gallery { margin-top: 0; gap: 10vh; }
-            .menu-item, .menu-item:nth-child(even) { width: 100%; align-items: flex-start; margin-right: 0; }
-            .menu-img-container { height: 60vh; }
-            .input-row { flex-direction: column; gap: 1rem; }
-            .input-row input, .input-row select { font-size: 1.5rem; }
-            .submit-btn { width: 140px; height: 140px; }
-            .character-art { opacity: 0.15; } /* Less intrusive on mobile */
+        @keyframes flap {
+            0% { transform: scaleY(1); }
+            100% { transform: scaleY(0.4); }
         }
     </style>
 </head>
 <body>
 
-    <div class="preloader" id="preloader">
-        <div class="preloader-text">ANIMA Q</div>
-        <div class="preloader-counter" id="counter">0%</div>
-    </div>
+    <svg id="dragonfly" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <g fill="#a2d5c6">
+            <rect x="48" y="10" width="4" height="80" rx="2" fill="#7a9e9f"/>
+            <ellipse class="wing" cx="30" cy="35" rx="20" ry="8" fill="rgba(244, 204, 216, 0.8)"/>
+            <ellipse class="wing" cx="70" cy="35" rx="20" ry="8" fill="rgba(244, 204, 216, 0.8)"/>
+            <ellipse class="wing" cx="35" cy="50" rx="15" ry="6" fill="rgba(196, 230, 243, 0.8)"/>
+            <ellipse class="wing" cx="65" cy="50" rx="15" ry="6" fill="rgba(196, 230, 243, 0.8)"/>
+        </g>
+    </svg>
 
-    <div class="cursor-dot" id="cursor-dot"></div>
-    <div class="cursor-outline" id="cursor-outline"></div>
+    <h1 class="header-title">bbsanii's demos</h1>
 
-    <div id="p5-container"></div>
+    <div class="container">
+        <div id="login-view" class="view-section active">
+            <input type="password" id="password-input" placeholder="Enter password to listen..." />
+        </div>
 
-    <div id="smooth-wrapper">
-        <div id="smooth-content">
+        <div id="user-view" class="view-section">
+            <ul class="link-list" id="public-link-list">
+                </ul>
+        </div>
+
+        <div id="admin-view" class="view-section">
+            <h3>Manage Demos</h3>
+            <ul class="link-list" id="admin-link-list">
+                </ul>
             
-            <img src="apron.png" class="character-art char-1" alt="ANIMA Q Waiter Art">
-            <img src="apron.png" class="character-art char-2" alt="ANIMA Q Waiter Art">
-            <img src="apron.png" class="character-art char-3" alt="ANIMA Q Waiter Art">
-
-            <nav>
-                <a href="#" class="logo magnetic-wrap"><span class="magnetic-item hover-target">ANIMA<span class="glowing-q">Q</span></span></a>
-                <div class="nav-links">
-                    <div class="magnetic-wrap"><a href="#menu" class="magnetic-item hover-target">Menu</a></div>
-                    <div class="magnetic-wrap"><a href="#booking" class="magnetic-item hover-target">Reserve</a></div>
-                </div>
-            </nav>
-
-            <section class="hero">
-                <h1 class="hero-title" id="hero-title">
-                    <span>Contemporary</span>
-                    <span class="indent">Tradition.</span>
-                </h1>
-            </section>
-
-            <section class="menu-section" id="menu">
-                <div class="menu-header-sticky" id="menu-sticky">
-                    <h2>Curated.<br>Refined.</h2>
-                    <p>An exploration of Italian purity, viewed through an avant-garde lens. Local ingredients, flawless execution.</p>
-                </div>
-                
-                <div class="menu-gallery">
-                    <div class="menu-item">
-                        <div class="menu-img-container reveal-trigger">
-                            <img src="https://images.unsplash.com/photo-1595295333158-4742f28fbd85?auto=format&fit=crop&w=1600&q=80" class="menu-img parallax-img" alt="Crudo">
-                        </div>
-                        <div class="menu-info">
-                            <h3>Crudo di Mare</h3>
-                            <span>32</span>
-                        </div>
-                    </div>
-
-                    <div class="menu-item">
-                        <div class="menu-img-container reveal-trigger">
-                            <img src="https://images.unsplash.com/photo-1473093295043-cdd812d0e601?auto=format&fit=crop&w=1600&q=80" class="menu-img parallax-img" alt="Pasta">
-                        </div>
-                        <div class="menu-info">
-                            <h3>Agnolotti del Plin</h3>
-                            <span>44</span>
-                        </div>
-                    </div>
-
-                    <div class="menu-item">
-                        <div class="menu-img-container reveal-trigger">
-                            <img src="https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&w=1600&q=80" class="menu-img parallax-img" alt="Wagyu">
-                        </div>
-                        <div class="menu-info">
-                            <h3>Filetto di Wagyu</h3>
-                            <span>85</span>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <section class="booking-section" id="booking">
-                <div class="booking-container">
-                    <h2 class="booking-title">Reserve</h2>
-                    <div class="input-row">
-                        <label>Guest</label>
-                        <input type="text" placeholder="Your Name" class="hover-target">
-                    </div>
-                    <div class="input-row">
-                        <label>Date</label>
-                        <input type="date" class="hover-target">
-                    </div>
-                    <div class="input-row">
-                        <label>Party</label>
-                        <select class="hover-target">
-                            <option value="" disabled selected>Select Size</option>
-                            <option value="2">Two Guests</option>
-                            <option value="4">Four Guests</option>
-                            <option value="6">Private Table</option>
-                        </select>
-                    </div>
-                    <div class="submit-wrap magnetic-wrap">
-                        <button class="submit-btn magnetic-item hover-target">Confirm</button>
-                    </div>
-                </div>
-            </section>
-
-            <footer>
-                Melbourne, VIC &mdash; &copy; 2026 ANIMA Q
-            </footer>
-
+            <div style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--glass-border);">
+                <h4>Add New Link</h4>
+                <input type="text" id="new-title" placeholder="Track Title" />
+                <input type="url" id="new-url" placeholder="https://..." />
+                <button onclick="addLink()" style="width: 100%;">Add Track</button>
+            </div>
+            
+            <button class="save-btn" onclick="saveAdminChanges()">Save Changes</button>
         </div>
     </div>
 
     <script>
-        // --- 1. Preloader ---
-        let count = 0;
-        const counterEl = document.getElementById('counter');
-        const preloader = document.getElementById('preloader');
-        const interval = setInterval(() => {
-            count += Math.floor(Math.random() * 10) + 1;
-            if (count >= 100) {
-                count = 100;
-                clearInterval(interval);
-                counterEl.innerText = count + '%';
-                setTimeout(() => {
-                    preloader.classList.add('hidden');
-                    document.getElementById('hero-title').style.opacity = 1;
-                    document.getElementById('hero-title').style.transform = 'translateY(0)';
-                    document.getElementById('hero-title').style.transition = 'all 1.5s cubic-bezier(0.165, 0.84, 0.44, 1) 0.5s';
-                }, 400);
-            } else {
-                counterEl.innerText = count + '%';
+        // Data State
+        const defaultLinks = [
+            { title: "2hrs & 2more hrs", url: "https://untitled.stream/library/project/QSMuAATjgMVMxumwuIWkz" }
+        ];
+
+        let links = JSON.parse(localStorage.getItem('bbsanii_demos')) || defaultLinks;
+
+        // Elements
+        const loginView = document.getElementById('login-view');
+        const userView = document.getElementById('user-view');
+        const adminView = document.getElementById('admin-view');
+        const passInput = document.getElementById('password-input');
+        const publicList = document.getElementById('public-link-list');
+        const adminList = document.getElementById('admin-link-list');
+
+        // Routing Logic
+        passInput.addEventListener('input', (e) => {
+            const val = e.target.value.toLowerCase();
+            if (val === 'dragonfly') {
+                showView(userView);
+                renderUserLinks();
+                stopDragonfly(); // Hide dragonfly on inner pages
+            } else if (val === 'dragonflyowner') {
+                showView(adminView);
+                renderAdminLinks();
+                stopDragonfly();
             }
-        }, 30);
-
-        // --- 2. Custom Smooth Scrolling & Layout Engine ---
-        const body = document.body;
-        const smoothWrapper = document.getElementById('smooth-wrapper');
-        const smoothContent = document.getElementById('smooth-content');
-        
-        let currentScroll = 0;
-        let targetScroll = 0;
-        
-        // Resize Observer ensures body height is perfectly accurate even if images load slowly (fixes cut-offs)
-        const resizeObserver = new ResizeObserver(() => {
-            body.style.height = smoothContent.getBoundingClientRect().height + 'px';
-        });
-        resizeObserver.observe(smoothContent);
-
-        window.addEventListener('scroll', () => { targetScroll = window.scrollY; });
-
-        // --- 3. Custom Cursor & Magnetic Elements ---
-        const dot = document.getElementById('cursor-dot');
-        const outline = document.getElementById('cursor-outline');
-        let mouseX = window.innerWidth / 2; let mouseY = window.innerHeight / 2;
-        let outlineX = mouseX; let outlineY = mouseY;
-
-        window.addEventListener('mousemove', (e) => { mouseX = e.clientX; mouseY = e.clientY; });
-
-        document.querySelectorAll('.hover-target').forEach(el => {
-            el.addEventListener('mouseenter', () => { dot.classList.add('hover'); outline.classList.add('hover'); });
-            el.addEventListener('mouseleave', () => { dot.classList.remove('hover'); outline.classList.remove('hover'); });
         });
 
-        document.querySelectorAll('.magnetic-wrap').forEach(wrap => {
-            const item = wrap.querySelector('.magnetic-item');
-            wrap.addEventListener('mousemove', (e) => {
-                const rect = wrap.getBoundingClientRect();
-                const x = e.clientX - rect.left - rect.width / 2;
-                const y = e.clientY - rect.top - rect.height / 2;
-                item.style.transform = `translate(${x * 0.4}px, ${y * 0.4}px)`;
+        function showView(view) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            view.classList.add('active');
+        }
+
+        // Render Functions
+        function renderUserLinks() {
+            publicList.innerHTML = '';
+            links.forEach(link => {
+                const li = document.createElement('li');
+                li.innerHTML = `<a href="${link.url}" target="_blank" class="link-item">${link.title} <span>↗</span></a>`;
+                publicList.appendChild(li);
             });
-            wrap.addEventListener('mouseleave', () => {
-                item.style.transform = `translate(0px, 0px)`;
+        }
+
+        function renderAdminLinks() {
+            adminList.innerHTML = '';
+            links.forEach((link, index) => {
+                const li = document.createElement('li');
+                li.className = 'link-item';
+                li.innerHTML = `
+                    <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 50%;">${link.title}</span>
+                    <div class="admin-controls">
+                        <button onclick="move(${index}, -1)" ${index === 0 ? 'disabled' : ''}>↑</button>
+                        <button onclick="move(${index}, 1)" ${index === links.length - 1 ? 'disabled' : ''}>↓</button>
+                        <button onclick="removeLink(${index})" style="color: #ff6b6b;">✕</button>
+                    </div>
+                `;
+                adminList.appendChild(li);
             });
-        });
-
-        // --- 4. Main Render Loop (Scroll + Parallax + Cursor) ---
-        const parallaxImgs = document.querySelectorAll('.parallax-img');
-        const revealTriggers = document.querySelectorAll('.reveal-trigger');
-        const menuSticky = document.getElementById('menu-sticky');
-        const menuSection = document.getElementById('menu');
-
-        function render() {
-            // Stiffer LERP for a more grounded, less fluid/jelly feel
-            currentScroll += (targetScroll - currentScroll) * 0.25; 
-            
-            // Apply straight translation (Skew removed for a more robust feel)
-            smoothContent.style.transform = `translate3d(0, ${-currentScroll}px, 0)`;
-
-            // Image Parallax & Reveal within Smooth Context
-            parallaxImgs.forEach((img, index) => {
-                const wrapper = revealTriggers[index];
-                const rect = wrapper.getBoundingClientRect(); 
-                if (rect.top < window.innerHeight && rect.bottom > 0) {
-                    wrapper.classList.add('in-view');
-                    const progress = (window.innerHeight - rect.top) / (window.innerHeight + rect.height);
-                    img.style.transform = `translate3d(0, ${-15 + (progress * 30)}%, 0) scale(1.1)`;
-                }
-            });
-
-            // Sticky Menu Header Logic
-            if(menuSection) {
-                const menuRect = menuSection.getBoundingClientRect();
-                if(window.innerWidth > 768) {
-                    if (menuRect.top < 0 && menuRect.bottom > window.innerHeight) {
-                        menuSticky.style.transform = `translate3d(0, ${-menuRect.top}px, 0)`;
-                    } else if (menuRect.top >= 0) {
-                        menuSticky.style.transform = `translate3d(0, 0, 0)`;
-                    }
-                }
-            }
-
-            // Cursor LERP
-            outlineX += (mouseX - outlineX) * 0.15;
-            outlineY += (mouseY - outlineY) * 0.15;
-            if(window.matchMedia("(pointer: fine)").matches) {
-                dot.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0)`;
-                outline.style.transform = `translate3d(${outlineX}px, ${outlineY}px, 0)`;
-            }
-
-            requestAnimationFrame(render);
-        }
-        render();
-
-        // --- 5. Advanced WebGL Shader (Reactive Moss/Liquid Gold) ---
-        // Projection matrices strictly lock the geometry avoiding cutoffs
-        const vertexShader = `
-            attribute vec3 aPosition;
-            attribute vec2 aTexCoord;
-            uniform mat4 uModelViewMatrix;
-            uniform mat4 uProjectionMatrix;
-            varying vec2 vTexCoord;
-            void main() {
-                vTexCoord = aTexCoord;
-                gl_Position = uProjectionMatrix * uModelViewMatrix * vec4(aPosition, 1.0);
-            }
-        `;
-
-        const fragmentShader = `
-            precision highp float;
-            uniform vec2 u_resolution;
-            uniform float u_time;
-            uniform vec2 u_mouse;
-
-            vec3 cBase = vec3(0.04, 0.07, 0.05); 
-            vec3 cMoss = vec3(0.12, 0.22, 0.15); 
-            vec3 cGold = vec3(0.9, 0.77, 0.36);  
-
-            float random(vec2 st) { return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123); }
-
-            float noise(vec2 st) {
-                vec2 i = floor(st); vec2 f = fract(st);
-                float a = random(i); float b = random(i + vec2(1.0, 0.0));
-                float c = random(i + vec2(0.0, 1.0)); float d = random(i + vec2(1.0, 1.0));
-                vec2 u = f * f * (3.0 - 2.0 * f);
-                return mix(a, b, u.x) + (c - a)* u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
-            }
-
-            float fbm(vec2 st) {
-                float v = 0.0; float a = 0.5;
-                mat2 rot = mat2(cos(0.5), sin(0.5), -sin(0.5), cos(0.5));
-                for (int i = 0; i < 5; ++i) {
-                    v += a * noise(st); st = rot * st * 2.0 + vec2(100.0); a *= 0.5;
-                }
-                return v;
-            }
-
-            void main() {
-                vec2 st = gl_FragCoord.xy / u_resolution.xy;
-                st.x *= u_resolution.x / u_resolution.y;
-
-                vec2 mousePos = u_mouse / u_resolution.xy;
-                mousePos.x *= u_resolution.x / u_resolution.y;
-                
-                // Tight spotlight on mouse
-                float dist = distance(st, mousePos);
-                float spotlight = smoothstep(0.25, 0.0, dist);
-                
-                // Distortion driven by mouse only (scroll interaction removed to stop jitter)
-                vec2 distVector = normalize(st - mousePos) * spotlight * 0.1;
-                st += distVector;
-
-                // Fluid mechanics
-                vec2 q = vec2(0.);
-                q.x = fbm(st + u_time * 0.02);
-                q.y = fbm(st + vec2(1.0) + u_time * 0.02);
-
-                vec2 r = vec2(0.);
-                r.x = fbm(st * 3.0 + q + u_time * 0.01);
-                r.y = fbm(st * 3.0 + q + vec2(8.3, 2.8));
-
-                float f = fbm(st * 2.0 + r);
-
-                // Construct texture
-                vec3 color = mix(cBase, cMoss, clamp((f*f)*2.0, 0.0, 1.0));
-                
-                // Liquid gold marbling
-                float goldMask = smoothstep(0.65, 0.9, fbm(st * 6.0 + r * 2.0));
-                color = mix(color, cGold, goldMask * 0.4);
-
-                // Apply tight spotlight
-                color += cMoss * spotlight * 0.8;
-                color += cGold * spotlight * 0.25;
-
-                // Add subtle grain
-                color += (random(st + u_time) - 0.5) * 0.04;
-
-                gl_FragColor = vec4(color, 1.0);
-            }
-        `;
-
-        let theShader;
-        let shaderMouseX = window.innerWidth / 2; 
-        let shaderMouseY = window.innerHeight / 2;
-
-        function setup() {
-            let canvas = createCanvas(windowWidth, windowHeight, WEBGL);
-            canvas.parent('p5-container');
-            // Prevent coordinates shrinking mismatching on retina screens
-            pixelDensity(1); 
-            theShader = createShader(vertexShader, fragmentShader);
-            noStroke();
         }
 
-        function draw() {
-            shader(theShader);
-            theShader.setUniform("u_resolution", [width, height]);
-            theShader.setUniform("u_time", millis() / 1000.0);
-            
-            // LERP shader mouse for smoother spotlight rendering independent of main JS loop
-            shaderMouseX += (mouseX - shaderMouseX) * 0.15;
-            shaderMouseY += (mouseY - shaderMouseY) * 0.15;
-            
-            let mx = constrain(shaderMouseX, 0, width);
-            let my = height - constrain(shaderMouseY, 0, height); 
-            
-            theShader.setUniform("u_mouse", [mx, my]);
-
-            // Draws a rectangle to fully cover the WebGL canvas
-            rect(-width/2, -height/2, width, height); 
+        // Admin Actions
+        function addLink() {
+            const title = document.getElementById('new-title').value;
+            const url = document.getElementById('new-url').value;
+            if (title && url) {
+                links.push({ title, url });
+                document.getElementById('new-title').value = '';
+                document.getElementById('new-url').value = '';
+                renderAdminLinks();
+            }
         }
 
-        function windowResized() { 
-            resizeCanvas(windowWidth, windowHeight); 
+        function removeLink(index) {
+            links.splice(index, 1);
+            renderAdminLinks();
         }
+
+        function move(index, direction) {
+            const newIndex = index + direction;
+            if (newIndex >= 0 && newIndex < links.length) {
+                const temp = links[index];
+                links[index] = links[newIndex];
+                links[newIndex] = temp;
+                renderAdminLinks();
+            }
+        }
+
+        function saveAdminChanges() {
+            localStorage.setItem('bbsanii_demos', JSON.stringify(links));
+            alert("Changes saved locally!");
+            // Update the user view array automatically
+            renderUserLinks();
+        }
+
+        // Dragonfly Animation Logic
+        const dragonfly = document.getElementById('dragonfly');
+        let dragonflyInterval;
+
+        function moveDragonfly() {
+            const x = Math.random() * (window.innerWidth - 100);
+            const y = Math.random() * (window.innerHeight - 100);
+            
+            // Calculate rotation based on direction
+            const rect = dragonfly.getBoundingClientRect();
+            const dx = x - rect.left;
+            const dy = y - rect.top;
+            const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+
+            dragonfly.style.transform = `translate(${x}px, ${y}px) rotate(${angle + 90}deg)`;
+        }
+
+        function startDragonfly() {
+            moveDragonfly();
+            dragonflyInterval = setInterval(moveDragonfly, 3000);
+        }
+
+        function stopDragonfly() {
+            clearInterval(dragonflyInterval);
+            dragonfly.style.display = 'none';
+        }
+
+        // Initialize
+        startDragonfly();
     </script>
 </body>
 </html>
